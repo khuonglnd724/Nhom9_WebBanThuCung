@@ -101,4 +101,4 @@ SELECT * FROM v_all_products LIMIT 10;
 ```
 
 ---
-Nếu cần bổ sung bảng hoặc sửa thiết kế, cập nhật cả `schema.sql` và file này. Mọi thắc mắc/đề xuất mở rộng: ghi chú lại để thảo luận nhóm.
+Nếu cần bổ sung bảng hoặc sửa thiết kế, cập nhật cả `dbwebthucung.sql` và file này. Mọi thắc mắc/đề xuất mở rộng: ghi chú lại để thảo luận nhóm.
