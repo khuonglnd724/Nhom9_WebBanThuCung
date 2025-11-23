@@ -103,122 +103,40 @@ SELECT * FROM v_all_products LIMIT 10;
 ---
 Nếu cần bổ sung bảng hoặc sửa thiết kế, cập nhật cả `dbwebthucung.sql` và file này. Mọi thắc mắc/đề xuất mở rộng: ghi chú lại để thảo luận nhóm.
 
-## 14. Trường `pets.image_meta` (lưu metadata hình ảnh)
+## 14. Trường `pets.URLImage` (đường dẫn ảnh đơn)
 
-Mục đích: Lưu metadata ảnh của thú cưng dưới dạng JSON linh hoạt (không bắt buộc). Không có dữ liệu mẫu được thêm cho trường này.
+Mục đích: Lưu một đường dẫn ảnh (URL hoặc relative path) cho thú cưng. Không cần JSON/gallery; chỉ một chuỗi là đủ.
 
-- Kiểu dữ liệu: `JSON NULL` (MySQL ≥ 5.7 / MariaDB ≥ 10.2). Nếu môi trường không hỗ trợ tốt JSON, có thể chuyển sang `TEXT` và lưu chuỗi JSON.
+- Kiểu dữ liệu: `VARCHAR(255) NULL`.
 - Vị trí trong bảng: sau `description` của bảng `pets`.
 
-### Cấu trúc JSON gợi ý
-Bạn có thể tùy biến theo nhu cầu. Ví dụ khuyến nghị:
-
-```json
-{
-	"main": {
-		"url": "https://cdn.example.com/pets/abc.jpg",
-		"alt": "Cún Poodle trắng",
-		"width": 1200,
-		"height": 800,
-		"mime": "image/jpeg",
-		"size_kb": 220
-	},
-	"gallery": [
-		{ "url": "https://cdn.example.com/pets/abc-1.jpg", "alt": "Góc nghiêng" },
-		{ "url": "https://cdn.example.com/pets/abc-2.jpg", "alt": "Đứng cạnh đồ chơi" }
-	]
-}
-```
-
 ### Cách ghi dữ liệu
-- Thêm mới cùng lúc khi tạo pet:
+- Thêm mới cùng lúc khi tạo pet (lưu URL tuyệt đối):
 ```sql
-INSERT INTO pets (category_id, name, breed, gender, age_months, price, stock, description, image_meta)
+INSERT INTO pets (category_id, name, breed, gender, age_months, price, stock, description, URLImage)
 VALUES (1, 'Poodle Trắng', 'Poodle', 'FEMALE', 8, 3500000, 1, 'Mô tả...',
-	JSON_OBJECT(
-		'main', JSON_OBJECT(
-			'url', 'https://cdn.example.com/pets/abc.jpg',
-			'alt', 'Cún Poodle trắng',
-			'width', 1200, 'height', 800, 'mime', 'image/jpeg', 'size_kb', 220
-		),
-		'gallery', JSON_ARRAY(
-			JSON_OBJECT('url','https://cdn.example.com/pets/abc-1.jpg','alt','Góc nghiêng'),
-			JSON_OBJECT('url','https://cdn.example.com/pets/abc-2.jpg','alt','Đứng cạnh đồ chơi')
-		)
-	)
-);
+				'http://localhost/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg');
 ```
 
-- Cập nhật ảnh chính:
+- Hoặc lưu đường dẫn tương đối (khuyến nghị để dễ deploy):
 ```sql
 UPDATE pets
-SET image_meta = JSON_SET(
-	COALESCE(image_meta, JSON_OBJECT()),
-	'$.main', JSON_OBJECT(
-		'url','https://cdn.example.com/pets/new-main.jpg',
-		'alt','Ảnh chính mới'
-	)
-)
-WHERE id = 123;
+SET URLImage = '/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg'
+WHERE id = 1;
 ```
 
-- Thêm một ảnh vào gallery (append):
+- Xóa ảnh (đưa về NULL):
 ```sql
-UPDATE pets
-SET image_meta = JSON_ARRAY_APPEND(
-	COALESCE(image_meta, JSON_OBJECT('gallery', JSON_ARRAY())),
-	'$.gallery', JSON_OBJECT('url','https://cdn.example.com/pets/new-1.jpg','alt','Góc cận')
-)
-WHERE id = 123;
+UPDATE pets SET URLImage = NULL WHERE id = 123;
 ```
 
-- Xóa metadata ảnh (đưa về NULL):
+### Truy vấn đọc
+- Lấy URL ảnh:
 ```sql
-UPDATE pets SET image_meta = NULL WHERE id = 123;
+SELECT id, URLImage AS image_url FROM pets;
 ```
 
-### Truy vấn đọc nhanh
-- Lấy URL ảnh chính:
-```sql
-SELECT id,
-			 JSON_UNQUOTE(JSON_EXTRACT(image_meta, '$.main.url')) AS main_url
-FROM pets;
-```
-
-- Lọc thú cưng có ảnh chính:
-```sql
-SELECT * FROM pets
-WHERE JSON_EXTRACT(image_meta, '$.main.url') IS NOT NULL;
-```
-
-- Lấy số lượng ảnh trong gallery (MySQL 8+):
-```sql
-SELECT id,
-			 JSON_LENGTH(JSON_EXTRACT(image_meta, '$.gallery')) AS gallery_count
-FROM pets;
-```
-
-Ghi chú: MySQL hỗ trợ toán tử `->` và `->>`; ví dụ `image_meta->'$.main.url'`. Tuy nhiên dùng `JSON_EXTRACT` + `JSON_UNQUOTE` sẽ phổ biến và tương thích hơn giữa MySQL/MariaDB.
-
-### Tương thích phiên bản
-- MySQL ≥ 5.7: hỗ trợ kiểu `JSON` và các hàm JSON (`JSON_OBJECT`, `JSON_SET`, `JSON_ARRAY_APPEND`, ...).
-- MariaDB ≥ 10.2: hỗ trợ hàm JSON, nhưng `JSON` có thể chỉ là alias của `LONGTEXT`. Vẫn dùng được các hàm trên. Nếu lỗi do phiên bản quá cũ, đổi cột về `TEXT`.
-
-#### Phương án fallback (nếu cần)
-- Đổi cột:
-```sql
-ALTER TABLE pets MODIFY image_meta TEXT NULL;
-```
-- Ứng dụng vẫn lưu/đọc chuỗi JSON. Nên validate JSON ở tầng ứng dụng trước khi ghi DB.
-
-### Gợi ý tối ưu (không bắt buộc)
-- Nếu cần tìm kiếm/ lọc theo `main.url` nhanh, có thể tạo cột sinh (generated column) và index:
-```sql
-ALTER TABLE pets
-	ADD COLUMN image_main_url VARCHAR(255)
-		GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(image_meta, '$.main.url'))) STORED,
-	ADD INDEX idx_pets_image_main_url (image_main_url);
-```
+Ghi chú: Ứng dụng có thể kiểm tra nếu `image_url` không bắt đầu bằng `http` thì ghép `BASE_URL` (ví dụ `http://localhost/Nhom9_WebBanThuCung/`).
 
 ## 15. Link ảnh nội bộ dự án (XAMPP)
 
@@ -230,37 +148,27 @@ Khi lưu ảnh chó/mèo trực tiếp trong dự án, nên đặt trong thư m�
 	- Đường dẫn hệ thống: `d:\xampp\htdocs\Nhom9_WebBanThuCung\uploads\pets\dogs\...`
 	- URL công khai (Apache/XAMPP): `http://localhost/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg`
 
-- Cách ghi đường dẫn vào `pets.image_meta` (khuyến nghị dùng đường dẫn tương đối để dễ deploy):
+- Cách ghi đường dẫn vào `pets.URLImage` (khuyến nghị dùng đường dẫn tương đối để dễ deploy):
 	- Tùy chọn A – Relative từ gốc web dự án (có prefix tên dự án): `'/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg'`
-	- Tùy chọn B – Relative không prefix (chỉ phần trong dự án): `'uploads/pets/dogs/abc.jpg'`
-	- Tùy backend, bạn ghép `BASE_URL` khi trả ra client.
+	- Tùy chọn B – Chỉ subpath trong dự án: `'uploads/pets/dogs/abc.jpg'` (ghép `BASE_URL` ở ứng dụng)
 
-Ví dụ lưu URL tương đối vào ảnh chính:
+Ví dụ lưu URL tương đối:
 ```sql
 UPDATE pets
-SET image_meta = JSON_SET(
-	COALESCE(image_meta, JSON_OBJECT()),
-	'$.main.url', '/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg',
-	'$.main.alt', 'Cún Poodle trắng'
-)
+SET URLImage = '/Nhom9_WebBanThuCung/uploads/pets/dogs/abc.jpg'
 WHERE id = 1;
 ```
 
 Ví dụ lưu chỉ subpath và ghép ở ứng dụng:
 ```sql
 UPDATE pets
-SET image_meta = JSON_SET(
-	COALESCE(image_meta, JSON_OBJECT()),
-	'$.main.url', 'uploads/pets/cats/meo-001.jpg'
-)
+SET URLImage = 'uploads/pets/cats/meo-001.jpg'
 WHERE id = 2;
 ```
 
-Truy vấn lấy URL ảnh chính:
+Truy vấn lấy URL ảnh:
 ```sql
-SELECT id,
-			 JSON_UNQUOTE(JSON_EXTRACT(image_meta, '$.main.url')) AS image_url
-FROM pets;
+SELECT id, URLImage AS image_url FROM pets;
 ```
 
 Gợi ý xử lý ở ứng dụng (mô tả ngắn):

@@ -38,7 +38,7 @@ CREATE TABLE pets (
   color VARCHAR(60),
   size VARCHAR(60),
   description TEXT,
-  image_meta JSON NULL,
+  URLImage VARCHAR(255) NULL,
   price DECIMAL(10,2) NOT NULL,
   stock INT NOT NULL DEFAULT 1,
   status ENUM('AVAILABLE','SOLD','HIDDEN') NOT NULL DEFAULT 'AVAILABLE',
