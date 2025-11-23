@@ -1,0 +1,123 @@
+/* Reset & cơ bản */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Container chính full height */
+#container {
+    display: flex;
+    height: 100vh; /* full màn hình */
+}
+
+/* Sidebar */
+#sidebar {
+    width: 220px;
+    background-color: #36404A;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+}
+
+/* Logo */
+#logo {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 10px;
+}
+#logo img { width: 100px; height: 100px; margin-right: 10px; }
+#logo span { font-size: 20px; font-weight: bold; }
+
+/* Menu */
+#main-menu {
+    list-style: none;
+    padding:0;
+    margin-top: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* căn lên trên */
+}
+
+#main-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #A9B8C5;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+#main-menu li a:hover, #main-menu li.active a {
+    background-color: #4DB5FF;
+    color: #fff;
+}
+#main-menu li a i { margin-right: 10px; }
+
+/* Main area: flex column */
+#main-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Banner */
+#banner {
+    background-color: #4DB5FF;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+/* Nội dung chính scroll */
+#main-content {
+    flex-grow: 1;
+    background: #fff;
+    margin: 20px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow-y: auto; /* scroll khi nội dung dài */
+}
+
+/* Footer luôn dưới */
+#footer {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-top: 1px solid #ccc;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Stat boxes */
+#stats-row { display: flex; gap: 20px; margin-bottom: 30px; }
+.stat-box { flex:1; padding:20px; border-radius:6px; color:#fff; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.stat-box .value { font-size:24px; font-weight:bold; display:block;}
+.stat-box .label { font-size:14px; margin-top:5px; display:block; opacity:0.8;}
+.stat-box .change { font-size:12px; font-style:italic; display:block; margin-top:5px;}
+.green{background-color:#2ECC71;}
+.blue{background-color:#3498DB;}
+.yellow{background-color:#F1C40F;}
+.purple{background-color:#9B59B6;}
+
+/* Dashboard area */
+.dashboard-area { display:flex; gap:20px; margin-bottom:30px; }
+.chart-box { flex:2; background:#fff; padding:20px; border:1px solid #e0e0e0; border-radius:6px; height:300px;}
+.chart-box.small{flex:1;}
+
+/* Bảng đơn hàng */
+#latest-orders h3{margin-top:0;color:#555;border-bottom:1px solid #eee;padding-bottom:10px;}
+#latest-orders table{width:100%;border-collapse:collapse;}
+#latest-orders th, #latest-orders td{padding:12px 15px;text-align:left;border-bottom:1px solid #ddd;}
+#latest-orders th{background-color:#f8f8f8;color:#666;font-weight:normal;}
+#latest-orders tr:hover{background-color:#f5f5f5;}
