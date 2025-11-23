@@ -12,7 +12,7 @@
     <!-- Sidebar -->
     <div id="sidebar">
         <div id="logo">
-            <img src="../images/logo1.png" >
+            <img src="../assets/images/logo1.png" >
             <span>StarryPets</span>
         </div>
         <?php include('menu.php'); ?>
