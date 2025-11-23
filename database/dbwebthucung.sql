@@ -38,6 +38,7 @@ CREATE TABLE pets (
   color VARCHAR(60),
   size VARCHAR(60),
   description TEXT,
+  image_meta JSON NULL,
   price DECIMAL(10,2) NOT NULL,
   stock INT NOT NULL DEFAULT 1,
   status ENUM('AVAILABLE','SOLD','HIDDEN') NOT NULL DEFAULT 'AVAILABLE',
@@ -151,9 +152,7 @@ INSERT INTO users (full_name, email, password_hash, phone, role) VALUES
 -- Categories (PET)
 INSERT INTO categories (name, slug, type) VALUES
  ('Chó','cho','PET'),
- ('Mèo','meo','PET'),
- ('Chim','chim','PET'),
- ('Hamster','hamster','PET');
+ ('Mèo','meo','PET');
 
 -- Categories (ACCESSORY)
 INSERT INTO categories (name, slug, type) VALUES
@@ -171,37 +170,33 @@ INSERT INTO pets (category_id, name, breed, gender, age_months, color, size, des
  (2,'Mướp','Ta','FEMALE',12,'Xám vằn','Trung bình','Mèo ta khỏe mạnh',900000,1),
  (2,'Snow','Anh lông dài','MALE',7,'Trắng','Trung bình','Lông dài mượt',4500000,1),
  (2,'Cookie','Scottish Fold','FEMALE',5,'Kem','Nhỏ','Tai cụp dễ thương',5000000,1),
- (3,'Chích Choè','Chích Choè','UNKNOWN',4,'Đen trắng','Nhỏ','Hót vui tai',600000,2),
- (3,'Sơn Ca','Sơn Ca','UNKNOWN',5,'Nâu','Nhỏ','Giọng hót cao',750000,2),
- (4,'Hammy','Syrian','MALE',3,'Vàng trắng','Rất nhỏ','Hamster đáng yêu',250000,5),
- (4,'Nana','Winter White','FEMALE',2,'Trắng xám','Rất nhỏ','Hiền lành',270000,4),
  (1,'Coco','Corgi','FEMALE',9,'Vàng trắng','Trung bình','Chân ngắn đáng yêu',9500000,1),
  (2,'Leo','Bengal','MALE',8,'Đốm nâu','Trung bình','Hoa văn độc đáo',7000000,1);
 
 -- Accessories (20–30 items)
 INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock) VALUES
- (5,'Hạt khô cho chó vị bò', 'PetFood', 'Ngũ cốc', '2kg','Dinh dưỡng cao',220000,30),
- (5,'Hạt khô cho chó vị gà', 'PetFood', 'Ngũ cốc', '2kg','Thơm ngon dễ ăn',210000,25),
- (6,'Thức ăn cho mèo vị cá biển', 'CatCare', 'Ngũ cốc', '1.5kg','Giàu Omega-3',240000,20),
- (6,'Pate cho mèo vị gà', 'CatCare', 'Thịt', '400g','Dễ tiêu hóa',65000,50),
- (7,'Bóng cao su phát sáng','PlayPet','Cao su','Nhỏ','Đồ chơi ban đêm',35000,100),
- (7,'Xương gặm sạch răng','PlayPet','Nhựa an toàn','Trung bình','Giúp sạch răng',55000,60),
- (7,'Chuột giả kêu','PlayPet','Vải','Nhỏ','Mèo thích đuổi bắt',28000,80),
- (8,'Cát vệ sinh cho mèo', 'CleanPet','Khoáng','10L','Hút mùi tốt',120000,40),
- (8,'Bàn chải lông', 'CleanPet','Nhựa + Inox','Nhỏ','Chải lông rụng',45000,35),
- (8,'Dầu tắm khử mùi cho chó', 'CleanPet','Dung dịch','250ml','Mùi dễ chịu',90000,25),
- (9,'Chuồng chó kích thước trung', 'SafeHome','Kim loại','Trung','Thoáng khí',650000,10),
- (9,'Lồng chim cỡ nhỏ', 'SafeHome','Kim loại','Nhỏ','Phù hợp chim nhỏ',280000,12),
- (9,'Lồng hamster 2 tầng', 'SafeHome','Nhựa','Nhỏ','Kèm bánh xe',320000,15),
- (5,'Snack thưởng huấn luyện', 'PetFood','Thịt','200g','Thưởng khi nghe lệnh',75000,45),
- (6,'Vitamin tổng hợp cho mèo', 'CatCare','Viên','Hộp','Tăng đề kháng',150000,18),
- (7,'Dây dắt chó phản quang', 'PlayPet','Nylon','M','An toàn ban đêm',95000,22),
- (7,'Vòng cổ tên khắc', 'PlayPet','Da','S','Khắc tên pet',110000,30),
- (8,'Bình nước tự động', 'CleanPet','Nhựa','500ml','Giữ sạch nước',60000,33),
- (8,'Khay vệ sinh cho mèo', 'CleanPet','Nhựa','Trung','Dễ vệ sinh',85000,27),
- (9,'Nhà gỗ cho mèo', 'SafeHome','Gỗ','Trung','ấm áp, bền',520000,9),
- (9,'Chuồng gấp cho chó', 'SafeHome','Kim loại','Lớn','Gấp gọn tiện',780000,6),
- (8,'Tông đơ cắt lông', 'CleanPet','Nhựa + Kim loại','--','Êm, ít ồn',230000,11);
+ (3,'Hạt khô cho chó vị bò', 'PetFood', 'Ngũ cốc', '2kg','Dinh dưỡng cao',220000,30),
+ (3,'Hạt khô cho chó vị gà', 'PetFood', 'Ngũ cốc', '2kg','Thơm ngon dễ ăn',210000,25),
+ (4,'Thức ăn cho mèo vị cá biển', 'CatCare', 'Ngũ cốc', '1.5kg','Giàu Omega-3',240000,20),
+ (4,'Pate cho mèo vị gà', 'CatCare', 'Thịt', '400g','Dễ tiêu hóa',65000,50),
+ (5,'Bóng cao su phát sáng','PlayPet','Cao su','Nhỏ','Đồ chơi ban đêm',35000,100),
+ (5,'Xương gặm sạch răng','PlayPet','Nhựa an toàn','Trung bình','Giúp sạch răng',55000,60),
+ (5,'Chuột giả kêu','PlayPet','Vải','Nhỏ','Mèo thích đuổi bắt',28000,80),
+ (6,'Cát vệ sinh cho mèo', 'CleanPet','Khoáng','10L','Hút mùi tốt',120000,40),
+ (6,'Bàn chải lông', 'CleanPet','Nhựa + Inox','Nhỏ','Chải lông rụng',45000,35),
+ (6,'Dầu tắm khử mùi cho chó', 'CleanPet','Dung dịch','250ml','Mùi dễ chịu',90000,25),
+ (7,'Chuồng chó kích thước trung', 'SafeHome','Kim loại','Trung','Thoáng khí',650000,10),
+ (7,'Lồng chim cỡ nhỏ', 'SafeHome','Kim loại','Nhỏ','Phù hợp chim nhỏ',280000,12),
+ (7,'Lồng hamster 2 tầng', 'SafeHome','Nhựa','Nhỏ','Kèm bánh xe',320000,15),
+ (3,'Snack thưởng huấn luyện', 'PetFood','Thịt','200g','Thưởng khi nghe lệnh',75000,45),
+ (4,'Vitamin tổng hợp cho mèo', 'CatCare','Viên','Hộp','Tăng đề kháng',150000,18),
+ (5,'Dây dắt chó phản quang', 'PlayPet','Nylon','M','An toàn ban đêm',95000,22),
+ (5,'Vòng cổ tên khắc', 'PlayPet','Da','S','Khắc tên pet',110000,30),
+ (6,'Bình nước tự động', 'CleanPet','Nhựa','500ml','Giữ sạch nước',60000,33),
+ (6,'Khay vệ sinh cho mèo', 'CleanPet','Nhựa','Trung','Dễ vệ sinh',85000,27),
+ (7,'Nhà gỗ cho mèo', 'SafeHome','Gỗ','Trung','ấm áp, bền',520000,9),
+ (7,'Chuồng gấp cho chó', 'SafeHome','Kim loại','Lớn','Gấp gọn tiện',780000,6),
+ (6,'Tông đơ cắt lông', 'CleanPet','Nhựa + Kim loại','--','Êm, ít ồn',230000,11);
 
 -- Sample order (empty details first)
 INSERT INTO orders (user_id, order_code, shipping_address, phone, payment_method, status) VALUES
