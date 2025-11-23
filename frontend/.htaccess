@@ -1,0 +1,13 @@
+# Rewrite rules to handle both .html and .php extensions
+RewriteEngine On
+
+# Redirect .html requests to .php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)\.html$ $1.php [R=301,L]
+
+# If file.php doesn't exist but file.html does, serve file.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]

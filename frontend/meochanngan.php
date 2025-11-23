@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StarryPets — Trang chủ</title>
+  <title>Mèo Chân Ngắn - StarryPets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
@@ -13,33 +13,33 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <a class="logo" href="index.html">
+      <a class="logo" href="index.php">
         <img src="../assets/images/logo1.png" alt="StarryPets Logo" style="height:100px;width:auto;">
       </a>
       <nav class="main-nav" id="mainNav">
         <ul class="menu">
-          <li class="active"><a href="index.html">Trang chủ</a></li>
+          <li><a href="index.php">Trang chủ</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle">Thú cưng <span style="font-size:12px">▼</span></a>
             <ul class="dropdown-menu">
-              <li><a href="alaska.html">Chó Alaska Malamute</a></li>
-              <li><a href="beagle.html">Chó Beagle</a></li>
-              <li><a href="corgi.html">Chó Corgi</a></li>
-              <li><a href="golden.html">Chó Golden Retriever</a></li>
-              <li><a href="husky.html">Chó Husky Siberian</a></li>
-              <li><a href="pomeranian.html">Chó Phốc Sóc – Pomeranian</a></li>
-              <li><a href="poodle.html">Chó Poodle</a></li>
-              <li><a href="pug.html">Chó Pug</a></li>
-              <li><a href="samoyed.html">Chó Samoyed</a></li>
-              <li><a href="meoanh.html">Mèo Anh (Dài + Ngắn)</a></li>
-              <li><a href="meochanngan.html">Mèo Chân Ngắn</a></li>
-              <li><a href="meotaicup.html">Mèo Tai Cụp</a></li>
+              <li><a href="alaska.php">Chó Alaska Malamute</a></li>
+              <li><a href="beagle.php">Chó Beagle</a></li>
+              <li><a href="corgi.php">Chó Corgi</a></li>
+              <li><a href="golden.php">Chó Golden Retriever</a></li>
+              <li><a href="husky.php">Chó Husky Siberian</a></li>
+              <li><a href="pomeranian.php">Chó Phốc Sóc – Pomeranian</a></li>
+              <li><a href="poodle.php">Chó Poodle</a></li>
+              <li><a href="pug.php">Chó Pug</a></li>
+              <li><a href="samoyed.php">Chó Samoyed</a></li>
+              <li><a href="meoanhlongdai.php">Mèo Anh (Dài + Ngắn)</a></li>
+              <li><a href="meochanngan.php">Mèo Chân Ngắn</a></li>
+              <li><a href="meotaicup.php">Mèo Tai Cụp</a></li>
             </ul>
           </li>
-          <li><a href="category.html">Phụ kiện</a></li>
-          <li><a href="#">Dịch vụ</a></li>
-          <li><a href="#">Giới thiệu</a></li>
-          <li><a href="#">Liên hệ</a></li>
+          <li><a href="category.php">Phụ kiện</a></li>
+          <li><a href="dichvu.php">Dịch vụ</a></li>
+          <li><a href="gioithieu.php">Giới thiệu</a></li>
+          <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -50,19 +50,21 @@
         <button id="mobileToggle" class="mobile-toggle" aria-label="menu">☰</button>
       </div>
     </div>
+    <div class="auth-links">
+      <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
+      <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+    </div>
     <div class="mini-cart" id="miniCart" aria-hidden="true">
       <div class="mini-inner">
         <h4>Giỏ hàng (<span class="cart-count">0</span>)</h4>
         <div class="mini-items">Chưa có sản phẩm</div>
         <div class="mini-total">Tổng: <strong>0₫</strong></div>
         <div class="mini-actions">
-          <a href="cart.html" class="btn">Xem giỏ</a>
-          <a href="#" class="btn btn-primary">Thanh toán</a>
+          <a href="cart.php" class="btn">Xem giỏ</a>
+          <a href="thanhtoan.php" class="btn btn-primary">Thanh toán</a>
         </div>
       </div>
     </div>
-
-
 
     <!-- Banner Slider Start -->
     <div class="banner-slider">
@@ -91,115 +93,19 @@
         <button class="btn search-btn" aria-label="search">🔍</button>
       </div>
     </div>
-    </header>
+  </header>
 
   <main>
-    <!-- Hero (dùng ảnh bạn upload làm preview) -->
-    <section class="hero container">
-      <div class="hero-left">
-        <h1>Chăm sóc & yêu thương thú cưng của bạn</h1>
-        <p>Phụ kiện – Thực phẩm – Dịch vụ giao hàng toàn quốc</p>
-        <a class="btn btn-primary" href="category.html">Xem sản phẩm</a>
-      </div>
-      <div class="hero-right">
-        <img src="/mnt/data/b5ec088e-2759-450e-a7da-79bf94582a86.png" alt="StarryPets hero">
-      </div>
-    </section>
-
     <!-- Breadcrumb -->
     <section class="breadcrumb container">
-      <span>Trang chủ</span> <span class="sep">|</span> <span>Danh mục sản phẩm</span>
+      <span>Trang chủ</span> <span class="sep">|</span> <span>Mèo Chân Ngắn</span>
     </section>
 
-    <!-- New products (populated from site content) -->
-    <section id="products" class="container products-section">
-      <h2 class="section-title">SẢN PHẨM MỚI</h2>
-      <div class="products-grid">
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=GOLDEN+ĐẸP+TRAI" alt="GOLDEN ĐẸP TRAI"></div>
-          <h3 class="title">GOLDEN ĐẸP TRAI</h3>
-          <div class="price">15.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="golden-dep-trai">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=SAMOYED+XINH" alt="SAMOYED XINH"></div>
-          <h3 class="title">SAMOYED XINH</h3>
-          <div class="price">14.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="samoyed-xinh">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=ALASKA+XAM+CUNG" alt="ALASKA XÁM CƯNG"></div>
-          <h3 class="title">ALASKA XÁM CƯNG</h3>
-          <div class="price">24.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="alaska-xam-cung">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=BAC+KINH+SIEU+BEO" alt="BẮC KINH SIÊU BÉO"></div>
-          <h3 class="title">BẮC KINH SIÊU BÉO</h3>
-          <div class="meta">ID: WEBSITE1758107906</div>
-          <div class="price">7.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="bac-kinh-sieu-beo">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=BICHON+TRANG" alt="BICHON TRẮNG XINH XINH"></div>
-          <h3 class="title">BICHON TRẮNG XINH XINH</h3>
-          <div class="price">30.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="bichon-trang">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=PHOC+SOC" alt="PHỐC SÓC BÉ XÍU CƯNG XĨU"></div>
-          <h3 class="title">PHỐC SÓC BÉ XÍU CƯNG XĨU</h3>
-          <div class="price">20.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="phoc-soc">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=SAMOYED+TRANG" alt="SAMOYED TRẮNG TINH XINH YÊU"></div>
-          <h3 class="title">SAMOYED TRẮNG TINH XINH YÊU</h3>
-          <div class="price">16.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="samoyed-trang">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=MEO+GOLDEN+LUN" alt="MÈO GOLDEN LÙN"></div>
-          <h3 class="title">MÈO GOLDEN LÙN</h3>
-          <div class="price">21.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="meo-golden-lun">Mua hàng</button>
-            <a class="btn btn-outline" href="product.html">Xem</a>
-          </div>
-        </article>
-
-      </div>
-      <div class="more center"><a class="btn" href="category.html">Xem thêm</a></div>
+    <!-- Content Section -->
+    <section class="container" style="margin: 40px 0; padding: 40px 0;">
+      <h1 style="font-size: 32px; margin-bottom: 20px; color: #333;">Mèo Chân Ngắn</h1>
+      <p style="font-size: 16px; line-height: 1.8; color: #666;">Trang thông tin về giống mèo chân ngắn.</p>
     </section>
-
   </main>
 
   <section class="instagram-row">
@@ -245,7 +151,9 @@
     <div class="container footer-credits">@2019 - Design by:StaryPets Team</div>
   </footer>
 
-  <script src="assets/js/script.js"></script>
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/cart.js"></script>
+  <script src="../assets/js/product-modal.js"></script>
     <script>
       // Fallback slider script (ensures slider always works)
       document.addEventListener('DOMContentLoaded', function() {
@@ -304,11 +212,12 @@
     </div>
   </div>
 
-  <div class="bottom-bar">
-    <a href="#"><div class="icon">🏠</div>Trang chủ</a>
-    <a href="#"><div class="icon">💬</div>Zalo</a>
-    <a href="#"><div class="icon">💬</div>Messenger</a>
-    <a href="tel:0939863696"><div class="icon">📞</div>Gọi điện</a>
-  </div>
 </body>
 </html>
+
+
+
+
+
+
+

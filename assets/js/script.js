@@ -1,4 +1,4 @@
-// Banner Slider
+// Thanh trượt Banner
 document.addEventListener('DOMContentLoaded', function() {
   const slides = document.querySelectorAll('.banner-slider .slide');
   const dots = document.querySelectorAll('.slider-dots .dot');
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
   autoSlide();
 });
 document.addEventListener('DOMContentLoaded', function(){
-  // mobile menu toggle simple (adds class to body)
+  // Bật/tắt menu di động đơn giản (thêm class vào body)
   const mobileToggle = document.getElementById('mobileToggle');
   mobileToggle && mobileToggle.addEventListener('click', () => {
     document.body.classList.toggle('mobile-open');
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(nav) nav.style.display = nav.style.display === 'block' ? 'none' : 'block';
   });
 
-  // mini cart toggle
+  // Bật/tắt giỏ hàng nhỏ
   const cartToggle = document.getElementById('cartToggle');
   const miniCart = document.getElementById('miniCart');
   cartToggle && cartToggle.addEventListener('click', () => {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function(){
     miniCart.setAttribute('aria-hidden', String(!isHidden));
   });
 
-  // fake add to cart
+  // Thêm vào giỏ hàng
   const updateCartCount = (n) => {
     document.querySelectorAll('.cart-count').forEach(el => el.textContent = n);
   };
@@ -87,28 +87,26 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      cartCount++;
-      updateCartCount(cartCount);
-      const miniItems = document.querySelector('.mini-items');
-      if(miniItems) miniItems.textContent = `${cartCount} sản phẩm (demo)`;
-      alert('Đã thêm vào giỏ (demo).');
+      const productId = btn.getAttribute('data-id');
+      addToCart(productId);
     });
   });
 
-  // Highlight active dropdown parent
+  // Làm nổi bật dropdown cha đang hoạt động
   const currentPage = window.location.pathname.split('/').pop();
-  if (currentPage && currentPage !== 'index.html') {
+  if (currentPage && currentPage !== 'index.php') {
     const activeLink = document.querySelector(`.main-nav .menu a[href$="${currentPage}"]`);
     if (activeLink) {
       const parentLi = activeLink.closest('li');
+
       if (parentLi) {
-        // If link is inside a dropdown, activate the top-level dropdown `li`
+        // Nếu link nằm bên trong dropdown, kích hoạt dropdown cấp cao nhất
         const dropdownParent = parentLi.closest('li.dropdown');
         if (dropdownParent) {
           document.querySelectorAll('.main-nav .menu > li').forEach(li => li.classList.remove('active'));
           dropdownParent.classList.add('active');
         } else {
-          // It's a top-level link itself
+          // Đó là một link cấp cao nhất
           document.querySelectorAll('.main-nav .menu > li').forEach(li => li.classList.remove('active'));
           parentLi.classList.add('active');
         }

@@ -357,11 +357,11 @@ body.mobile-open .main-nav .menu{flex-direction:column;gap:6px}
   transition:transform 0.2s;
 }
 
-/* mini cart */
+/* Giỏ hàng nhỏ */
 .mini-cart{
-  position:absolute;right:28px;top:90px;width:320px;background:#fff;
+  position:fixed;right:28px;top:100px;width:320px;background:#fff;
   border:1.5px solid #f7dce8;border-radius:14px;display:none;padding:12px;
-  box-shadow:0 8px 22px rgba(211,107,159,0.08)
+  box-shadow:0 8px 22px rgba(211,107,159,0.08);z-index:9999;max-height:80vh;overflow-y:auto;
 }
 .mini-cart[aria-hidden="false"]{display:block}
 
@@ -495,3 +495,462 @@ main > section.container {
   .header-inner{padding:10px}
   .footer-inner{flex-direction:column}
 }
+/* ============================
+   FORM ĐĂNG NHẬP / ĐĂNG KÝ
+   ============================ */
+.auth-container {
+    max-width: 420px;
+    margin: 80px auto;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: "Baloo 2", sans-serif;
+}
+
+.auth-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: 0.2s;
+    font-family: inherit;
+}
+
+.auth-container input:focus {
+    border-color: #ff6900;
+    box-shadow: 0 0 0 2px rgba(255,105,0,0.2);
+    outline: none;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background: #ff6900;
+    border: none;
+    color: #fff;
+    font-size: 17px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: inherit;
+    margin-top: 5px;
+}
+
+.auth-btn:hover {
+    background: #e65d00;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.auth-link a {
+    color: #ff6900;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+/* == AUTH LINKS (Đăng nhập / Đăng ký) == */
+
+.auth-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 18px 0;
+    padding: 12px 0;
+}
+
+.btn-login {
+    padding: 8px 16px;
+    background: #ff8fb0;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: 0.25s;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-login:hover {
+    background: #ff6f90;
+}
+
+.btn-register {
+    padding: 8px 16px;
+    background: #ffb36b;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: 0.25s;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-register:hover {
+    background: #ff9d3d;
+}
+
+.auth-btn {
+    padding: 7px 14px;
+    background: #ff8fb0;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: 0.25s;
+}
+
+.auth-btn:hover {
+    background: #ff6f90;
+}
+
+.auth-btn.register {
+    background: #ffb36b;
+}
+
+.auth-btn.register:hover {
+    background: #ff9d3d;
+}
+
+/* === CART PAGE === */
+.cart-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 150px 40px;
+    gap: 15px;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-row img {
+    border-radius: 4px;
+}
+
+.cart-info h4 {
+    margin: 0 0 5px;
+}
+
+.cart-info p {
+    margin: 0;
+    color: var(--pink2);
+    font-weight: 600;
+}
+
+.qty-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100px;
+}
+
+.qty-box button {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.qty-box button:hover {
+    background: #f0f0f0;
+}
+
+.qty-box span {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+}
+
+.remove-btn {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #f00;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.remove-btn:hover {
+    background: #ffe0e0;
+}
+
+.subtotal {
+    color: var(--pink2);
+    font-weight: 600;
+}
+
+/* === CHECKOUT PAGE === */
+.checkout-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .checkout-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+.checkout-summary {
+    position: sticky;
+    top: 100px;
+}
+
+@media (max-width: 768px) {
+    .checkout-summary {
+        position: static;
+    }
+}
+
+/* === MINI CART ITEMS === */
+.mini-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+}
+
+.mini-item img {
+    border-radius: 4px;
+}
+
+.mini-item div {
+    flex: 1;
+}
+
+.mini-item p {
+    margin: 0 0 5px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.mini-item span {
+    color: var(--pink2);
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* Product Modal */
+.product-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.product-modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  color: #999;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 40px;
+}
+
+.modal-image {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.modal-image img {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.modal-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-details h2 {
+  font-size: 24px;
+  margin: 0;
+  color: #222;
+}
+
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.modal-rating .stars {
+  font-size: 18px;
+}
+
+.modal-price {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.modal-price .current-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--pink2);
+}
+
+.modal-section {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+.modal-section h3 {
+  font-size: 16px;
+  margin: 0 0 12px 0;
+  color: #222;
+}
+
+.modal-section p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-table tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-table tr:last-child {
+  border-bottom: none;
+}
+
+.modal-table td {
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.modal-table td:first-child {
+  font-weight: 500;
+  color: #666;
+  width: 40%;
+}
+
+.modal-table td:last-child {
+  color: #333;
+}
+
+.modal-policy {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-policy li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.modal-actions .btn {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .modal-image img {
+    max-width: 100%;
+  }
+
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+

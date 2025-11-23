@@ -1,4 +1,4 @@
-<!-- category-filter.html: Dropdown lọc danh mục dùng chung cho mọi trang -->
+<!-- category-filter.php: Dropdown lọc danh mục dùng chung cho mọi trang -->
 <div class="container category-search-dropdown" style="margin: 24px auto; max-width: 400px;">
   <div style="position:relative;">
     <button id="catDropdownBtn" style="width:100%;padding:10px 16px;font-size:18px;border:1px solid #ddd;background:#fff;border-radius:8px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
@@ -86,3 +86,9 @@
     }
   });
 </script>
+
+
+
+
+
+
