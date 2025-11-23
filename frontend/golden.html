@@ -1,0 +1,99 @@
+
+  <script src="assets/js/script.js"></script>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chó Golden Retriever - StarryPets</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <img src="images/logo.jpg" alt="StarryPets Logo" style="height:100px;width:auto;">
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <ul class="menu">
+          <li><a href="index.html">Trang chủ</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle">Thú cưng <span style="font-size:12px">▼</span></a>
+            <ul class="dropdown-menu">
+              <li><a href="alaska.html">Chó Alaska Malamute</a></li>
+              <li><a href="beagle.html">Chó Beagle</a></li>
+              <li><a href="corgi.html">Chó Corgi</a></li>
+              <li><a href="golden.html">Chó Golden Retriever</a></li>
+              <li><a href="husky.html">Chó Husky Siberian</a></li>
+              <li><a href="pomeranian.html">Chó Phốc Sóc – Pomeranian</a></li>
+              <li><a href="poodle.html">Chó Poodle</a></li>
+              <li><a href="pug.html">Chó Pug</a></li>
+              <li><a href="samoyed.html">Chó Samoyed</a></li>
+              <li><a href="meoanh.html">Mèo Anh (Dài + Ngắn)</a></li>
+              <li><a href="meochanngan.html">Mèo Chân Ngắn</a></li>
+              <li><a href="meotaicup.html">Mèo Tai Cụp</a></li>
+            </ul>
+          </li>
+          <li><a href="category.html">Phụ kiện</a></li>
+          <li><a href="#">Dịch vụ</a></li>
+          <li><a href="#">Giới thiệu</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button id="cartToggle" class="cart-btn">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-label"><strong>Giỏ hàng</strong><br><span class="cart-count">0</span> sản phẩm - 0đ</span>
+        </button>
+        <button id="mobileToggle" class="mobile-toggle" aria-label="menu">☰</button>
+      </div>
+    </div>
+    <div class="mini-cart" id="miniCart" aria-hidden="true">
+      <div class="mini-inner">
+        <h4>Giỏ hàng (<span class="cart-count">0</span>)</h4>
+        <div class="mini-items">Chưa có sản phẩm</div>
+        <div class="mini-total">Tổng: <strong>0₫</strong></div>
+        <div class="mini-actions">
+          <a href="cart.html" class="btn">Xem giỏ</a>
+          <a href="#" class="btn btn-primary">Thanh toán</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Slider Start -->
+  <div class="banner-slider">
+    <div class="slides">
+      <div class="slide active"><img src="images/banner 1.jpg" alt="Banner 1"></div>
+      <div class="slide"><img src="images/banner 2.jpg" alt="Banner 2"></div>
+      <div class="slide"><img src="images/banner 3.jpg" alt="Banner 3"></div>
+    </div>
+    <button class="slider-btn prev">&#10094;</button>
+    <button class="slider-btn next">&#10095;</button>
+    <div class="slider-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+  <!-- Banner Slider End -->
+  <main class="container">
+    <h1>Chó Golden Retriever</h1>
+    <p>Trang thông tin về giống chó Golden Retriever.</p>
+  </main>
+    <div style="display:flex;gap:16px;align-items:center;max-width:700px;margin:24px auto 0 auto;">
+      <div id="categoryFilterContainer" style="flex:1 1 220px;"></div>
+      <input class="search-input" placeholder="Tìm kiếm..." style="flex:2 1 320px;padding:10px 16px;font-size:18px;border:1px solid #ddd;border-radius:8px;" />
+      <button class="btn search-btn" aria-label="search" style="height:44px;width:44px;border-radius:8px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:20px;">
+        <span>🔍</span>
+      </button>
+    </div>
+    <script>
+      fetch('category-filter.html')
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById('categoryFilterContainer').innerHTML = html;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!-- category-filter.html: Dropdown lọc danh mục dùng chung cho mọi trang -->
+<div class="container category-search-dropdown" style="margin: 24px auto; max-width: 400px;">
+  <div style="position:relative;">
+    <button id="catDropdownBtn" style="width:100%;padding:10px 16px;font-size:18px;border:1px solid #ddd;background:#fff;border-radius:8px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+      <span id="catDropdownLabel">Tất cả danh mục</span>
+      <span style="font-size:18px;">▼</span>
+    </button>
+    <ul id="catDropdownList" class="list-none dropdown-list" style="display:none;position:absolute;top:110%;left:0;width:100%;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:10;max-height:320px;overflow-y:auto;">
+      <li class="active"><a class="select-cat-search" href="#" data-filter="">Tất cả danh mục</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-akita">Chó Akita</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-bichon-danh-muc-cun">Chó Bichon</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-chow-chow">Chó Chow Chow</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-chow-chow-danh-muc-cun">Chó Chow Chow</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-collie">Chó Collie</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-doberman">Chó Doberman</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".day-vong-co">Dây vòng cổ</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".do-dung-ve-sinh">Đồ Dùng Vệ Sinh</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".labrador">Labrador</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".may-tu-dong">Máy tự động</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".ro-mom-phu-kien">Rọ Mõm</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".danh-muc-meo">Danh Mục Mèo</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".meo-anh-dai-ngan">Mèo Anh (Dài + Ngắn)</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".meo-chan-ngan">Mèo Chân Ngắn</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".meo-tai-cup">Mèo Tai Cụp</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".danh-muc-cun">Danh Mục Cún</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".alaska-malamute">Chó Alaska Malamute</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cho-bac-kinh">Chó Bắc Kinh</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".beagle">Chó Beagle</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".corgi">Chó Corgi</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".golden-retriever">Chó Golden Retriever</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".husky-siberian">Chó Husky Siberian</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".lap-xuong">Chó Lạp Xưởng</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".pomeranian">Chó Phốc Sóc - Pomeranian</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".poodle">Chó Poodle</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".pug">Chó Pug</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".bull-phap">Chó Bull Pháp</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".samoyed">Chó Samoyed</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".phu-kien">Phụ Kiện</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".ao">Áo</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".ban-cao">Bàn Cào</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".bat">Bát</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".do-choi">Đồ Chơi</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".khay-ve-sinh">Khay vệ sinh</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".vong-co">Vòng Cổ</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".thuc-pham">Thực Phẩm</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".banh-thuong">Bánh Thưởng</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".hat">Hạt</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".pate">Pate</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".sua">Sữa</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".chuong">Chuồng</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".nem">Nệm</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".balo">Balo</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".tui-van-chuyen">Túi Vận Chuyển</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".cat-ve-sinh">Cát Vệ Sinh</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".my-pham-lam-dep">Mỹ Phẩm & Làm Đẹp</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".nuoc-hoa">Nước Hoa</a></li>
+      <li><a class="select-cat-search" href="#" data-filter=".sua-tam">Sữa Tắm</a></li>
+    </ul>
+  </div>
+</div>
+<script>
+  // Dropdown logic
+  const catBtn = document.getElementById('catDropdownBtn');
+  const catList = document.getElementById('catDropdownList');
+  const catLabel = document.getElementById('catDropdownLabel');
+  catBtn && catBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    catList.style.display = catList.style.display === 'block' ? 'none' : 'block';
+  });
+  catList && catList.addEventListener('mouseleave', function() {
+    catList.style.display = 'none';
+  });
+  catList && catList.querySelectorAll('a.select-cat-search').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      catLabel.textContent = a.textContent;
+      catList.style.display = 'none';
+      catList.querySelectorAll('li').forEach(function(li) { li.classList.remove('active'); });
+      a.parentElement.classList.add('active');
+      // TODO: Thêm logic lọc sản phẩm theo data-filter nếu cần
+    });
+  });
+  document.addEventListener('click', function(e) {
+    if (!catBtn.contains(e.target) && !catList.contains(e.target)) {
+      catList.style.display = 'none';
+    }
+  });
+</script>
