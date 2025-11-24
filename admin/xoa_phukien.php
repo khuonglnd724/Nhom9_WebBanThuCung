@@ -1,16 +1,38 @@
 <?php
-include "../config.php";
+// Secure delete accessory handler
+require_once __DIR__ . '/../connect.php';
 
-$id = $_GET['id'];
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    header('Location: index.php?p=phukien');
+    exit;
+}
+$id = (int) $_GET['id'];
 
-// Xóa ảnh cũ
-$img = $conn->query("SELECT image FROM accessories WHERE id=$id")->fetch_assoc();
-if ($img['image'] != "") {
-    unlink("../images/" . $img['image']);
+if (!isset($conn) || $conn === null) {
+    die('DB connection not available');
 }
 
-$conn->query("DELETE FROM accessories WHERE id=$id");
+// Fetch current image name
+$stmt = $conn->prepare('SELECT image FROM accessories WHERE id = ?');
+$stmt->bind_param('i', $id);
+$stmt->execute();
+$res = $stmt->get_result();
+$row = $res->fetch_assoc();
+$stmt->close();
 
-header("Location: index.php?p=phukien");
+if ($row && !empty($row['image'])) {
+    $file = __DIR__ . '/../assets/images/' . $row['image'];
+    if (file_exists($file)) {
+        @unlink($file);
+    }
+}
+
+// Delete record
+$stmt2 = $conn->prepare('DELETE FROM accessories WHERE id = ?');
+$stmt2->bind_param('i', $id);
+$stmt2->execute();
+$stmt2->close();
+
+header('Location: index.php?p=phukien');
 exit;
 ?>
