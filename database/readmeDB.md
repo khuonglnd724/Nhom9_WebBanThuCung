@@ -3,6 +3,20 @@
 Ngày tạo: 22-11-2025  
 Thành viên phụ trách: Backend / Database / API (Thành viên 3)
 
+---
+
+## 🔑 Tài khoản mẫu (Test Credentials)
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@petshop.test` | `admin123` | ADMIN |
+| `a.customer@petshop.test` | `customer123A` | CUSTOMER |
+| `b.customer@petshop.test` | `customer123B` | CUSTOMER |
+
+*Lưu ý: Các password đã được hash bằng bcrypt trong database.*
+
+---
+
 ## 1. Mục tiêu
 Cung cấp cấu trúc CSDL cho website bán thú cưng và phụ kiện: quản lý người dùng, danh mục, thú cưng, phụ kiện, đơn hàng và chi tiết đơn hàng. File triển khai chính: `dbwebthucung.sql`.
 

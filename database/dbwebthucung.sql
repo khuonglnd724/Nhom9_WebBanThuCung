@@ -27,12 +27,23 @@ CREATE TABLE categories (
   CONSTRAINT fk_categories_parent FOREIGN KEY(parent_id) REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+-- Breeds table (dog and cat breeds)
+CREATE TABLE breeds (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  pet_type ENUM('DOG','CAT') NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_breeds_type (pet_type)
+) ENGINE=InnoDB;
+
 -- Pets table (individual animals for sale)
 CREATE TABLE pets (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category_id INT NOT NULL,
   name VARCHAR(100) NOT NULL,
-  breed VARCHAR(100) NULL,
+  breed_id INT NULL,
   gender ENUM('MALE','FEMALE','UNKNOWN') DEFAULT 'UNKNOWN',
   age_months INT DEFAULT 0,
   color VARCHAR(60),
@@ -45,7 +56,9 @@ CREATE TABLE pets (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_pets_category FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_pets_breed FOREIGN KEY(breed_id) REFERENCES breeds(id) ON DELETE SET NULL ON UPDATE CASCADE,
   INDEX idx_pets_category (category_id),
+  INDEX idx_pets_breed (breed_id),
   INDEX idx_pets_status (status)
 ) ENGINE=InnoDB;
 
@@ -144,11 +157,12 @@ DELIMITER ;
 -- 3) Seed Data (Sample) - Adjust as needed
 -- =============================================================
 
--- Users (passwords should be hashed by application; using placeholder hashes)
+-- Users (passwords should be hashed by application; using valid bcrypt hashes)
+-- Credentials: admin@petshop.test / admin123, a.customer@petshop.test / customer123A, b.customer@petshop.test / customer123B
 INSERT INTO users (full_name, email, password_hash, phone, role) VALUES
- ('Admin User','admin@petshop.test','$2y$10$exampleadminhash','0900000000','ADMIN'),
- ('Nguyen Van A','a.customer@petshop.test','$2y$10$examplehashA','0911111111','CUSTOMER'),
- ('Tran Thi B','b.customer@petshop.test','$2y$10$examplehashB','0922222222','CUSTOMER');
+ ('Admin User','admin@petshop.test','$2y$10$oLLx8xmkMWVlpUrtD3zSmeeo/Kb4OjQBmOXRDk.JhiVRAWuL8rH5i','0900000000','ADMIN'),
+ ('Nguyen Van A','a.customer@petshop.test','$2y$10$3KejE8fMKqzzPsdRGPpoButXg.gYvggYJGOC6RO4rq.p4oZNVNJnq','0911111111','CUSTOMER'),
+ ('Tran Thi B','b.customer@petshop.test','$2y$10$c5xA/34VHBHrGA98PhhOL.8JCEk1VZuLzPSzdQLAQyD2KE05cS4Z6','0922222222','CUSTOMER');
 
 -- Categories (PET)
 INSERT INTO categories (name, slug, type) VALUES
@@ -163,16 +177,30 @@ INSERT INTO categories (name, slug, type) VALUES
  ('Phụ kiện vệ sinh','phu-kien-ve-sinh','ACCESSORY'),
  ('Chuồng / Lồng','chuong-long','ACCESSORY');
 
+-- Breeds (dog breeds)
+INSERT INTO breeds (name, pet_type, description) VALUES
+ ('Poodle','DOG','Chó lông xoăn thông minh, dễ huấn luyện'),
+ ('Phốc Sóc','DOG','Chó nhỏ năng động, lông dày'),
+ ('Golden Retriever','DOG','Chó vàng thân thiện, trung thành'),
+ ('Corgi','DOG','Chó chân ngắn, tai dài đặc trưng');
+
+-- Breeds (cat breeds)
+INSERT INTO breeds (name, pet_type, description) VALUES
+ ('Mèo Ta','CAT','Mèo bản địa Việt Nam khỏe mạnh'),
+ ('Anh lông dài','CAT','Mèo Anh lông dài mượt mà'),
+ ('Scottish Fold','CAT','Mèo tai cụp đáng yêu'),
+ ('Bengal','CAT','Mèo hoa văn đốm độc đáo');
+
 -- Pets (approx 12-15)
-INSERT INTO pets (category_id, name, breed, gender, age_months, color, size, description, price, stock) VALUES
- (1,'Lucky','Poodle','MALE',8,'Trắng','Nhỏ','Chó Poodle lông xoăn khỏe mạnh',3500000,1),
- (1,'Bống','Phốc Sóc','FEMALE',6,'Vàng','Nhỏ','Phốc sóc năng động',4200000,1),
- (1,'Milo','Golden Retriever','MALE',10,'Vàng','Lớn','Golden thân thiện',8000000,1),
- (2,'Mướp','Ta','FEMALE',12,'Xám vằn','Trung bình','Mèo ta khỏe mạnh',900000,1),
- (2,'Snow','Anh lông dài','MALE',7,'Trắng','Trung bình','Lông dài mượt',4500000,1),
- (2,'Cookie','Scottish Fold','FEMALE',5,'Kem','Nhỏ','Tai cụp dễ thương',5000000,1),
- (1,'Coco','Corgi','FEMALE',9,'Vàng trắng','Trung bình','Chân ngắn đáng yêu',9500000,1),
- (2,'Leo','Bengal','MALE',8,'Đốm nâu','Trung bình','Hoa văn độc đáo',7000000,1);
+INSERT INTO pets (category_id, name, breed_id, gender, age_months, color, size, description, price, stock) VALUES
+ (1,'Lucky',1,'MALE',8,'Trắng','Nhỏ','Chó Poodle lông xoăn khỏe mạnh',3500000,1),
+ (1,'Bống',2,'FEMALE',6,'Vàng','Nhỏ','Phốc sóc năng động',4200000,1),
+ (1,'Milo',3,'MALE',10,'Vàng','Lớn','Golden thân thiện',8000000,1),
+ (2,'Mướp',5,'FEMALE',12,'Xám vằn','Trung bình','Mèo ta khỏe mạnh',900000,1),
+ (2,'Snow',6,'MALE',7,'Trắng','Trung bình','Lông dài mượt',4500000,1),
+ (2,'Cookie',7,'FEMALE',5,'Kem','Nhỏ','Tai cụp dễ thương',5000000,1),
+ (1,'Coco',4,'FEMALE',9,'Vàng trắng','Trung bình','Chân ngắn đáng yêu',9500000,1),
+ (2,'Leo',8,'MALE',8,'Đốm nâu','Trung bình','Hoa văn độc đáo',7000000,1);
 
 -- Accessories (20–30 items)
 INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock) VALUES

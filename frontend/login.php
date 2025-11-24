@@ -81,7 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
         </div>
         <script>
-            setTimeout(function(){ window.location.href = 'index.php'; }, 1000);
+            <?php 
+            $redirect_url = ($_SESSION['user_role'] === 'ADMIN') ? '../admin/index.php' : 'index.php';
+            ?>
+            setTimeout(function(){ window.location.href = '<?php echo $redirect_url; ?>'; }, 1000);
         </script>
     <?php endif; ?>
 
