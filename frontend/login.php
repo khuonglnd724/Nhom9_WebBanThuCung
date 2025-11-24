@@ -1,3 +1,43 @@
+<?php
+session_start();
+include '../connect.php';
+
+$error = '';
+$success = '';
+$email_input = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email_input = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $password_input = isset($_POST['password']) ? $_POST['password'] : '';
+
+    try {
+        if (!isset($conn)) {
+            throw new Exception('Không kết nối được CSDL.');
+        }
+        $stmt = $conn->prepare('SELECT id, full_name, email, password_hash, role FROM users WHERE email = ? LIMIT 1');
+        if (!$stmt) { throw new Exception('Lỗi prepare: ' . $conn->error); }
+        $stmt->bind_param('s', $email_input);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            if (password_verify($password_input, $row['password_hash'])) {
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['user_name'] = $row['full_name'];
+                $_SESSION['user_email'] = $row['email'];
+                $_SESSION['user_role'] = $row['role'];
+                $success = 'Đăng nhập thành công!';
+            } else {
+                $error = 'Sai mật khẩu.';
+            }
+        } else {
+            $error = 'Email không tồn tại.';
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        $error = 'Có lỗi xảy ra: ' . $e->getMessage();
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -30,10 +70,26 @@
 <div class="form-box">
     <h2>Đăng nhập</h2>
 
-    <input type="text" id="username" placeholder="Tên đăng nhập">
-    <input type="password" id="password" placeholder="Mật khẩu">
+    <?php if ($error !== ''): ?>
+        <div style="color:#b30000; background:#fdecea; padding:8px 10px; border-radius:4px; margin-bottom:10px;">
+            <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif; ?>
 
-    <button onclick="login()">Đăng nhập</button>
+    <?php if ($success !== ''): ?>
+        <div style="color:#155724; background:#d4edda; padding:8px 10px; border-radius:4px; margin-bottom:10px;">
+            <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+        <script>
+            setTimeout(function(){ window.location.href = 'index.php'; }, 1000);
+        </script>
+    <?php endif; ?>
+
+    <form method="post" action="" id="loginForm">
+        <input type="email" name="email" id="email" placeholder="Email" maxlength="120" value="<?php echo htmlspecialchars($email_input, ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="password" name="password" id="password" placeholder="Mật khẩu" minlength="6">
+        <button type="button" onclick="login()">Đăng nhập</button>
+    </form>
 
     <div class="text-center">
         Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a>
@@ -42,20 +98,22 @@
 
 <script>
     function login() {
-        let user = document.getElementById("username").value;
-        let pass = document.getElementById("password").value;
-
-        if (user === "" || pass === "") {
-            alert("Vui lòng nhập đầy đủ thông tin!");
+        var email = document.getElementById('email').value.trim();
+        var pass = document.getElementById('password').value;
+        if (!email || !pass) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
-
-        // Giả lập đăng nhập thành công
-        localStorage.setItem("userLoggedIn", "true");
-        localStorage.setItem("username", user);
-
-        alert("Đăng nhập thành công!");
-        window.location.href = "index.php";
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Email không hợp lệ!');
+            return;
+        }
+        if (pass.length < 6) {
+            alert('Mật khẩu tối thiểu 6 ký tự!');
+            return;
+        }
+        document.getElementById('loginForm').submit();
     }
 </script>
 
