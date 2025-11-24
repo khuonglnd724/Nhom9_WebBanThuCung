@@ -121,3 +121,406 @@ html, body {
 #latest-orders th, #latest-orders td{padding:12px 15px;text-align:left;border-bottom:1px solid #ddd;}
 #latest-orders th{background-color:#f8f8f8;color:#666;font-weight:normal;}
 #latest-orders tr:hover{background-color:#f5f5f5;}
+
+/* ===========================
+   TRANG DANH SÁCH THÚ CƯNG
+=========================== */
+
+.page-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.top-bar {
+    margin-bottom: 15px;
+}
+
+.btn-add {
+    background: #4DB5FF;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.btn-add:hover {
+    background: #35a5f0;
+}
+
+.pet-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pet-table th {
+    background: #f0f4f8;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    color: #666;
+    border-bottom: 1px solid #ddd;
+}
+
+.pet-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.pet-table tr:hover {
+    background: #f8f8f8;
+}
+
+.pet-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Nút sửa, xóa */
+.btn-edit, .btn-delete {
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.btn-edit {
+    background: #2ecc71;
+    color: white;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    margin-left: 5px;
+}
+
+.btn-edit:hover { background: #27ae60; }
+.btn-delete:hover { background: #c0392b; }
+
+/* ===========================
+      FORM THÊM THÚ CƯNG
+=========================== */
+
+/* Container chung cho form */
+.pet-form {
+    max-width: 600px; /* Giới hạn chiều rộng để form không quá dài */
+    margin: 20px auto; /* Căn giữa form */
+    padding: 30px;
+    background-color: #ffffff; /* Nền trắng */
+    border-radius: 8px; /* Bo tròn góc */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Tạo khoảng cách giữa các phần tử */
+}
+
+/* Tiêu đề trang */
+.page-title {
+    color: #36404A; /* Màu tối của sidebar để đồng bộ */
+    font-size: 24px;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4DB5FF; /* Đường kẻ xanh nổi bật */
+    margin-bottom: 20px;
+    text-align: center; /* Căn giữa tiêu đề */
+}
+
+/* Label (nhãn) */
+.pet-form label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+    display: block; /* Đảm bảo label chiếm trọn một dòng */
+}
+
+/* Input, Select, Textarea */
+.pet-form input[type="text"],
+.pet-form input[type="number"],
+.pet-form input[type="file"],
+.pet-form select,
+.pet-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Tính padding và border vào trong width */
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus effect */
+.pet-form input:focus,
+.pet-form select:focus,
+.pet-form textarea:focus {
+    border-color: #4DB5FF; /* Màu xanh khi focus */
+    box-shadow: 0 0 0 3px rgba(77, 181, 255, 0.2);
+    outline: none; /* Loại bỏ đường viền mặc định của trình duyệt */
+}
+
+/* Textarea riêng */
+.pet-form textarea {
+    resize: vertical; /* Chỉ cho phép thay đổi chiều cao */
+    min-height: 100px;
+}
+
+/* Input type file riêng */
+.pet-form input[type="file"] {
+    padding: 10px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+/* Button Lưu Thú Cưng */
+.btn-save {
+    background-color: #4DB5FF; /* Màu xanh dương nổi bật */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-save:hover {
+    background-color: #3498DB; /* Đậm hơn khi hover */
+}
+
+.btn-save:active {
+    transform: scale(0.99); /* Hiệu ứng nhấn */
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: #4DB5FF;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background: #359cdc;
+}
+
+/* ===========================
+   SỬA THÚ CƯNG / CHUNG CHO FORM SỬA
+   (tối ưu hóa form sửa để giống form thêm)
+=========================== */
+
+/* Container hiện ảnh hiện tại */
+.pet-form .current-image {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pet-form .current-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+/* Make file input and preview align nicely */
+.pet-form input[type="file"] {
+    padding: 8px 10px;
+    background: #fbfbfb;
+    border: 1px solid #e6e6e6;
+}
+
+/* Smaller labels for compact edit view */
+.pet-form label {
+    font-size: 15px;
+}
+
+/* Ensure the save button matches the add form */
+.btn-save { display: inline-block; }
+
+/* Responsive: on small screens stack image preview above fields */
+@media (max-width: 600px) {
+    .pet-form { padding: 20px; }
+    .pet-form .current-image { flex-direction: column; align-items: flex-start; }
+    .pet-form .current-image img { width: 100%; height: auto; }
+}
+
+/* --- 1. Top Bar (Hàng ngang lớn) --- */
+.top-bar {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* --- 2. Form Tìm Kiếm & Lọc --- */
+/* Layout for search/filter form: controls + standalone button side-by-side on wide screens,
+   stack vertically on small screens */
+.search-filter-form {
+    display: flex;
+    flex-direction: row; /* đặt controls và nút cạnh nhau */
+    gap: 12px; /* khoảng cách giữa các phần tử */
+    align-items: center;
+    justify-content: flex-start; /* căn controls sang trái */
+    flex: 1 1 auto; /* chiếm không gian để nút Thêm nằm bên phải */
+}
+
+/* --- 3. Search Controls (Ô tìm kiếm và Select Loại - Nằm kế bên nhau) --- */
+.search-controls {
+    display: flex; /* Dùng Flexbox để xếp ngang Input và Select */
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa Input và Select */
+}
+
+/* Responsive: khi màn nhỏ thì xếp cột (giữ hành vi cũ) */
+@media (max-width: 700px) {
+    .search-filter-form { flex-direction: column; align-items: flex-start; }
+    .search-controls { width: 100%; gap: 8px; }
+    .search-input { width: 100%; }
+    .filter-select { width: 100%; }
+    .btn-submit.btn-filter-standalone { width: auto; }
+}
+
+/* Make the standalone filter button smaller when used in the top-bar */
+.btn-submit.btn-filter-standalone {
+    padding: 6px 10px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 4px;
+    height: auto;
+    min-width: 60px;
+}
+
+/* --- 4. Input Tìm kiếm (Điều chỉnh chiều rộng cho phù hợp khi nằm cạnh Select) --- */
+.search-input {
+    /* Giữ nguyên padding và icon */
+    padding: 10px 10px 10px 35px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 180px; /* Điều chỉnh chiều rộng nhỏ hơn một chút */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* --- 5. Nút Submit Lọc (Xuống dòng riêng biệt) --- */
+.btn-submit.btn-filter-standalone {
+    /* Đảm bảo nút lọc nằm dưới */
+    width: auto; 
+    padding: 8px 15px;
+    font-size: 14px;
+    /* ... (Giữ nguyên các style khác của nút) */
+}
+
+/* --- Giữ nguyên các styles khác --- */
+.input-group {
+    position: relative;
+}
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+}
+.filter-select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    transition: border-color 0.3s;
+}
+.btn-add {
+    background-color: #2ECC71; 
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+}
+.btn-add i { margin-right: 8px; font-size: 16px; }
+
+.pet-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+.pet-table th, .pet-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.pet-table th {
+    background: #f5f5f5;
+    font-weight: bold;
+}
+
+.btn-edit, .btn-delete, .btn-copy {
+    padding: 6px 12px;
+    border-radius: 5px;
+    color: white;
+    text-decoration: none;
+    margin: 3px;
+    display: inline-block;
+}
+
+.btn-edit { background: #007bff; }
+.btn-edit:hover { background: #0056b3; }
+
+.btn-copy { background: #17a2b8; }
+.btn-copy:hover { background: #117a8b; }
+
+.btn-delete { background: #dc3545; }
+.btn-delete:hover { background: #bd2130; }
+
+/* Status */
+.status-active {
+    color: green;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: red;
+    font-weight: bold;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.btn-add:hover { background: #218838; }

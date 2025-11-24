@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>PetSky - Trang Chủ</title>
-<link rel="stylesheet" href="../assets/css/styleadmin.css">
+<?php
+// Tạo đường dẫn base động dựa trên vị trí script để CSS luôn load đúng khi deploy ở bất kỳ thư mục nào
+$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
+?>
+<link rel="stylesheet" href="<?php echo $base; ?>/assets/css/styleadmin.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -28,7 +32,7 @@
                 $page = isset($_GET['p']) ? $_GET['p'] : 'main';
                 
                 // Danh sách các file hợp lệ
-                $valid_pages = ['main', 'thucung', 'phukien', 'donhang','thongke','user'];
+                $valid_pages = ['main', 'thucung', 'phukien', 'donhang','thongke','user', 'them_thucung','sua_thucung','them_phukien','sua_phukien'];
 
                 if (in_array($page, $valid_pages)) {
                     include($page . '.php');

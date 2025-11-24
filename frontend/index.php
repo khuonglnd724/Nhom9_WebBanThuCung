@@ -14,7 +14,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="index.php">
-        <img src="../assets/images/logo1.png" alt="StarryPets Logo" style="height:100px;width:auto;">
+        <img src="../assets/images/logo.png" alt="StarryPets Logo" style="height:100px;width:auto;">
       </a>
       <nav class="main-nav" id="mainNav">
         <ul class="menu">
