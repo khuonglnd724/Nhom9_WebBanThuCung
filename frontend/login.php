@@ -1,126 +1,194 @@
 <?php
-session_start();
-include '../connect.php';
+$mysqli = new mysqli('localhost', 'root', '', 'wedthucung');
+if ($mysqli->connect_error) {
+    die("Kết nối CSDL thất bại: " . $mysqli->connect_error);
+}
 
-$error = '';
-$success = '';
-$email_input = '';
+// Xử lý form đăng nhập
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email_input = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $password_input = isset($_POST['password']) ? $_POST['password'] : '';
+    $stmt = $mysqli->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    try {
-        if (!isset($conn)) {
-            throw new Exception('Không kết nối được CSDL.');
-        }
-        $stmt = $conn->prepare('SELECT id, full_name, email, password_hash, role FROM users WHERE email = ? LIMIT 1');
-        if (!$stmt) { throw new Exception('Lỗi prepare: ' . $conn->error); }
-        $stmt->bind_param('s', $email_input);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if (password_verify($password_input, $row['password_hash'])) {
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['user_name'] = $row['full_name'];
-                $_SESSION['user_email'] = $row['email'];
-                $_SESSION['user_role'] = $row['role'];
-                $success = 'Đăng nhập thành công!';
-            } else {
-                $error = 'Sai mật khẩu.';
-            }
-        } else {
-            $error = 'Email không tồn tại.';
-        }
-        $stmt->close();
-    } catch (Exception $e) {
-        $error = 'Có lỗi xảy ra: ' . $e->getMessage();
+    if ($result->num_rows > 0) {
+        echo "<script>
+            alert('Đăng nhập thành công với username: $username');
+            window.location.href = 'index.php';
+        </script>";
+        exit();
+    } else {
+        echo "<script>alert('Đăng nhập thất bại! Sai tên đăng nhập hoặc mật khẩu.');</script>";
+    }
+}
+
+// Xử lý form đăng ký
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
+    $username = $_POST['reg_username'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $password = $_POST['reg_password'];
+
+    $stmt = $mysqli->prepare("INSERT INTO users (username, email, phone, password) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $username, $email, $phone, $password);
+    $register_success = $stmt->execute();
+
+    if ($register_success) {
+        echo "<script>
+            alert('Đăng ký thành công với email: $email');
+            document.addEventListener('DOMContentLoaded', function() {
+              const container = document.querySelector('.container');
+              container.classList.remove('active');
+            });
+        </script>";
+    } else {
+        echo "<script>alert('Đăng ký thất bại! Có thể email hoặc username đã tồn tại.');</script>";
+    }
+}
+
+// Xử lý form quên mật khẩu
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['forgot'])) {
+    $email = $_POST['forgot_email'];
+
+    $stmt = $mysqli->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        echo "<script>alert('Liên kết đặt lại mật khẩu đã được gửi đến email: $email');</script>";
+    } else {
+        echo "<script>alert('Không tìm thấy email trong hệ thống.');</script>";
     }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập</title>
-    <style>
-        body { font-family: Arial; background:#f4f4f4; }
-        .form-box {
-            width: 360px; margin: 80px auto; padding: 20px;
-            background: #fff; border-radius: 6px; box-shadow: 0 0 10px #ccc;
-        }
-        h2 { text-align:center; margin-bottom:20px; }
-        input {
-            width:100%; padding:10px; margin:8px 0;
-            border:1px solid #ccc; border-radius:4px;
-        }
-        button {
-            width:100%; padding:10px; background:#007bff;
-            color:#fff; border:none; border-radius:4px;
-            cursor:pointer; font-size:16px;
-        }
-        button:hover { background:#005fc4; }
-        .text-center { text-align:center; margin-top:10px; }
-        a { color:#007bff; text-decoration:none; }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập / Đăng ký - StarryPets</title>
+    <link rel="stylesheet" href="../assets/css/login-style.css" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 </head>
+
 <body>
-
-<div class="form-box">
-    <h2>Đăng nhập</h2>
-
-    <?php if ($error !== ''): ?>
-        <div style="color:#b30000; background:#fdecea; padding:8px 10px; border-radius:4px; margin-bottom:10px;">
-            <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+    <header class="navbar">
+        <div class="navbar-logo">
+            <i class='bx bxs-paw'></i>
+            <a href="index.php">StarryPets</a>
         </div>
-    <?php endif; ?>
+        <nav class="navbar-menu">
+            <a href="index.php">Trang chủ</a>
+            <a href="dichvu.php">Dịch vụ</a>
+            <a href="gioithieu.php">Giới thiệu</a>
+            <a href="lienhe.php">Liên hệ</a>
+        </nav>
+    </header>
 
-    <?php if ($success !== ''): ?>
-        <div style="color:#155724; background:#d4edda; padding:8px 10px; border-radius:4px; margin-bottom:10px;">
-            <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
+    <div class="container">
+        <!-- Đăng nhập -->
+        <div class="from-box login">
+            <form action="" method="POST">
+                <h1>Đăng nhập</h1>
+                <div class="input-box">
+                    <input type="text" name="username" placeholder="Tên Đăng Nhập" required />
+                    <i class="bx bx-user"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Mật khẩu" required />
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#" class="forgot-btn">Quên mật khẩu</a>
+                </div>
+                <button type="submit" name="login" class="btn">Đăng nhập</button>
+                <p>hoặc đăng nhập trên phương tiện khác</p>
+                <div class="social-icons">
+                    <a href="#"><i class="bx bxl-google"></i></a>
+                    <a href="#"><i class="bx bxl-facebook"></i></a>
+                    <a href="#"><i class="bx bxl-github"></i></a>
+                </div>
+            </form>
         </div>
-        <script>
-            <?php 
-            $redirect_url = ($_SESSION['user_role'] === 'ADMIN') ? '../admin/index.php' : 'index.php';
-            ?>
-            setTimeout(function(){ window.location.href = '<?php echo $redirect_url; ?>'; }, 1000);
-        </script>
-    <?php endif; ?>
 
-    <form method="post" action="" id="loginForm">
-        <input type="email" name="email" id="email" placeholder="Email" maxlength="120" value="<?php echo htmlspecialchars($email_input, ENT_QUOTES, 'UTF-8'); ?>">
-        <input type="password" name="password" id="password" placeholder="Mật khẩu" minlength="6">
-        <button type="button" onclick="login()">Đăng nhập</button>
-    </form>
+        <!-- Đăng ký -->
+        <div class="from-box register">
+            <form action="" method="POST">
+                <h1>Đăng ký</h1>
+                <div class="input-box">
+                    <input type="text" name="reg_username" placeholder="Tên Đăng Ký" required />
+                    <i class="bx bx-user"></i>
+                </div>
 
-    <div class="text-center">
-        Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a>
+                <div class="input-box">
+                    <input type="email" name="email" placeholder="Email" required />
+                    <i class="bx bxs-envelope"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="tel" name="phone" placeholder="Số điện thoại" required />
+                    <i class="bx bx-phone"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" name="reg_password" placeholder="Mật khẩu" required />
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#" class="forgot-btn">Quên mật khẩu</a>
+                </div>
+                <button type="submit" name="register" class="btn">Đăng ký</button>
+                <p>hoặc đăng nhập trên phương tiện khác</p>
+                <div class="social-icons">
+                    <a href="#"><i class="bx bxl-google"></i></a>
+                    <a href="#"><i class="bx bxl-facebook"></i></a>
+                    <a href="#"><i class="bx bxl-github"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quên mật khẩu -->
+        <div class="from-box forgot">
+            <form action="" method="POST">
+                <h1>Quên mật khẩu</h1>
+                <p>Nhập địa chỉ email để nhận liên kết đặt lại mật khẩu.</p>
+
+                <div class="input-box">
+                    <input type="email" name="forgot_email" placeholder="Email đã đăng ký" required />
+                    <i class="bx bxs-envelope"></i>
+                </div>
+
+                <button type="submit" name="forgot" class="btn">Gửi liên kết đặt lại</button>
+                <p><a href="#" class="back-to-login">Quay lại đăng nhập</a></p>
+            </form>
+        </div>
+
+        <!-- Panel chuyển đổi -->
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Xin chào</h1>
+                <p>Nếu bạn chưa có tài khoản để đăng nhập thì hãy click vào nút bên </p>
+                <button class="btn register-btn">Đăng Ký</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Chào mừng trở lại</h1>
+                <p>Đã có sẵn tài khoản</p>
+                <button class="btn login-btn">Đăng nhập</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    function login() {
-        var email = document.getElementById('email').value.trim();
-        var pass = document.getElementById('password').value;
-        if (!email || !pass) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
-            return;
-        }
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Email không hợp lệ!');
-            return;
-        }
-        if (pass.length < 6) {
-            alert('Mật khẩu tối thiểu 6 ký tự!');
-            return;
-        }
-        document.getElementById('loginForm').submit();
-    }
-</script>
-
+    <script src="../assets/js/login-scripts.js"></script>
 </body>
+
 </html>
 
 
