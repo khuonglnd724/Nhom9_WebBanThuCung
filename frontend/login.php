@@ -1,8 +1,9 @@
 <?php
-$mysqli = new mysqli('localhost', 'root', '', 'wedthucung');
+$mysqli = new mysqli('localhost', 'root', '', 'dbwebthucung');
 if ($mysqli->connect_error) {
     die("Kết nối CSDL thất bại: " . $mysqli->connect_error);
 }
+$mysqli->set_charset("utf8mb4");
 
 // Xử lý form đăng nhập
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
