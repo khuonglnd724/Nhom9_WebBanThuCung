@@ -8,13 +8,13 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset("utf8mb4");
 
 // Tạo database nếu chưa tồn tại
-$create_db = "CREATE DATABASE IF NOT EXISTS dbwebthucung";
+$create_db = "CREATE DATABASE IF NOT EXISTS pet";
 if (!$mysqli->query($create_db)) {
     die("Lỗi tạo database: " . $mysqli->error);
 }
 
 // Chọn database
-$mysqli->select_db("dbwebthucung");
+$mysqli->select_db("pet");
 
 // Tạo bảng users
 $create_users = "

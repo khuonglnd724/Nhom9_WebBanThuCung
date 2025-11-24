@@ -1,40 +1,73 @@
 <?php
-$mysqli = new mysqli('localhost', 'root', '', 'dbwebthucung');
+// Kết nối database
+$db_host = '127.0.0.1';
+$db_user = 'root';
+$db_pass = '';
+$db_name = 'pet';
+
+$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
+
+// Kiểm tra lỗi kết nối
 if ($mysqli->connect_error) {
-    die("Kết nối CSDL thất bại: " . $mysqli->connect_error);
+    $error_msg = $mysqli->connect_error;
+    
+    // Nếu lỗi "using password: NO", hướng dẫn start MySQL
+    if (strpos($error_msg, 'using password: NO') !== false || 
+        strpos($error_msg, 'Connection refused') !== false) {
+        die("<h2>❌ Lỗi: MySQL Server không chạy!</h2>
+            <p>Vui lòng:</p>
+            <ol>
+                <li>Mở XAMPP Control Panel</li>
+                <li>Click <strong>Start</strong> trên MySQL</li>
+                <li>Quay lại trang này và refresh</li>
+            </ol>
+            <p>Chi tiết lỗi: " . htmlspecialchars($error_msg) . "</p>");
+    }
+    
+    die("❌ Kết nối CSDL thất bại: " . htmlspecialchars($error_msg));
 }
+
 $mysqli->set_charset("utf8mb4");
 
 // Xử lý form đăng nhập
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
-    $username = $_POST['username'];
+    $email = $_POST['username']; // Dùng email để đăng nhập
     $password = $_POST['password'];
 
-    $stmt = $mysqli->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-    $stmt->bind_param("ss", $username, $password);
+    $stmt = $mysqli->prepare("SELECT id, full_name, email, password_hash, role FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "<script>
-            alert('Đăng nhập thành công với username: $username');
-            window.location.href = 'index.php';
-        </script>";
-        exit();
+        $user = $result->fetch_assoc();
+        // Kiểm tra password với bcrypt hash
+        if (password_verify($password, $user['password_hash'])) {
+            echo "<script>
+                alert('Đăng nhập thành công!');
+                window.location.href = 'index.php';
+            </script>";
+            exit();
+        } else {
+            echo "<script>alert('Đăng nhập thất bại! Sai email hoặc mật khẩu.');</script>";
+        }
     } else {
-        echo "<script>alert('Đăng nhập thất bại! Sai tên đăng nhập hoặc mật khẩu.');</script>";
+        echo "<script>alert('Đăng nhập thất bại! Email không tồn tại.');</script>";
     }
 }
 
 // Xử lý form đăng ký
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
-    $username = $_POST['reg_username'];
+    $full_name = $_POST['reg_username'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $password = $_POST['reg_password'];
+    
+    // Hash password bằng bcrypt
+    $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = $mysqli->prepare("INSERT INTO users (username, email, phone, password) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $username, $email, $phone, $password);
+    $stmt = $mysqli->prepare("INSERT INTO users (full_name, email, phone, password_hash, role, status) VALUES (?, ?, ?, ?, 'CUSTOMER', 'ACTIVE')");
+    $stmt->bind_param("ssss", $full_name, $email, $phone, $password_hash);
     $register_success = $stmt->execute();
 
     if ($register_success) {
@@ -46,7 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
             });
         </script>";
     } else {
-        echo "<script>alert('Đăng ký thất bại! Có thể email hoặc username đã tồn tại.');</script>";
+        if ($stmt->errno == 1062) {
+            echo "<script>alert('Đăng ký thất bại! Email đã tồn tại.');</script>";
+        } else {
+            echo "<script>alert('Đăng ký thất bại! ' . $stmt->error);</script>";
+        }
     }
 }
 
@@ -54,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['forgot'])) {
     $email = $_POST['forgot_email'];
 
-    $stmt = $mysqli->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt = $mysqli->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -99,8 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['forgot'])) {
             <form action="" method="POST">
                 <h1>Đăng nhập</h1>
                 <div class="input-box">
-                    <input type="text" name="username" placeholder="Tên Đăng Nhập" required />
-                    <i class="bx bx-user"></i>
+                    <input type="email" name="username" placeholder="Email" required />
+                    <i class="bx bx-envelope"></i>
                 </div>
 
                 <div class="input-box">
@@ -125,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['forgot'])) {
             <form action="" method="POST">
                 <h1>Đăng ký</h1>
                 <div class="input-box">
-                    <input type="text" name="reg_username" placeholder="Tên Đăng Ký" required />
+                    <input type="text" name="reg_username" placeholder="Họ và Tên" required />
                     <i class="bx bx-user"></i>
                 </div>
 
