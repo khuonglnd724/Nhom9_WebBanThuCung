@@ -58,7 +58,7 @@ CREATE TABLE accessories (
   material VARCHAR(80),
   size VARCHAR(60),
   description TEXT,
-  URLImage VARCHAR(255) NULL
+  URLImage VARCHAR(255) NULL,
   price DECIMAL(10,2) NOT NULL,
   stock INT NOT NULL DEFAULT 0,
   status ENUM('ACTIVE','INACTIVE','OUT_OF_STOCK') NOT NULL DEFAULT 'ACTIVE',
