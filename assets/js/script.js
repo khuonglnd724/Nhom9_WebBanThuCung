@@ -72,10 +72,12 @@ document.addEventListener('DOMContentLoaded', function(){
     document.querySelectorAll('.cart-count').forEach(el => el.textContent = n);
   };
   let cartCount = 0;
-    document.querySelectorAll('.main-nav .dropdown-toggle').forEach(function(toggle){
-      toggle.addEventListener('click', function(e){
-        e.preventDefault(); // Không chuyển trang, không mở tab mới
-        // Đóng các dropdown khác
+  // Chỉ chặn mặc định nếu link dùng '#' để làm toggle.
+  document.querySelectorAll('.main-nav .dropdown-toggle').forEach(function(toggle){
+    toggle.addEventListener('click', function(e){
+      const href = toggle.getAttribute('href') || '';
+      if (href === '#' || toggle.dataset.toggle === 'dropdown') {
+        e.preventDefault();
         document.querySelectorAll('.main-nav .dropdown').forEach(function(drop){
           if(drop.contains(toggle)){
             drop.classList.toggle('open');
@@ -83,8 +85,42 @@ document.addEventListener('DOMContentLoaded', function(){
             drop.classList.remove('open');
           }
         });
+      }
+      // Nếu href là trang hợp lệ (vd pet.php) thì để trình duyệt điều hướng bình thường
+    });
+  });
+  // Bảo đảm click chữ "Thú cưng" sẽ điều hướng (không áp dụng khi nhấn caret)
+  document.querySelectorAll('.main-nav .dropdown > a.dropdown-toggle').forEach(function(link){
+    link.addEventListener('click', function(e){
+      const isCaret = e.target && e.target.closest('.caret');
+      if (isCaret) return; // caret đã có handler riêng
+      const href = link.getAttribute('href');
+      if (href && href !== '#') {
+        if (e.defaultPrevented) {
+          // Nếu có script khác đã chặn, ta vẫn điều hướng thủ công
+          window.location.href = href;
+        }
+        // Ngược lại để điều hướng mặc định của trình duyệt
+      }
+    });
+  });
+  // Cho phép nhấn vào caret để chỉ mở dropdown, không điều hướng
+  document.querySelectorAll('.main-nav .dropdown-toggle .caret').forEach(function(caret){
+    caret.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      const drop = caret.closest('li.dropdown');
+      if (!drop) return;
+      // Đóng các dropdown khác, mở/tắt dropdown hiện tại
+      document.querySelectorAll('.main-nav .dropdown').forEach(function(item){
+        if (item === drop) {
+          item.classList.toggle('open');
+        } else {
+          item.classList.remove('open');
+        }
       });
     });
+  });
   document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const productId = btn.getAttribute('data-id');

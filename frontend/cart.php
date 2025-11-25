@@ -1,3 +1,8 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,7 +11,7 @@
   <title>Giỏ hàng - StarryPets</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body>
+<body<?php if ($isLoggedIn): ?> data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>"<?php endif; ?>>
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="index.php">
@@ -33,7 +38,6 @@
             </ul>
           </li>
           <li><a href="category.php">Phụ kiện</a></li>
-          <li><a href="dichvu.php">Dịch vụ</a></li>
           <li><a href="gioithieu.php">Giới thiệu</a></li>
           <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
@@ -47,8 +51,13 @@
       </div>
     </div>
     <div class="auth-links">
-      <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
-      <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php if ($isLoggedIn): ?>
+        <span style="margin-right: 15px; color: #333;">Xin chào, <strong><?php echo htmlspecialchars($userName); ?></strong></span>
+        <a href="logout.php" class="btn-login">Đăng xuất</a>
+      <?php else: ?>
+        <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
+        <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php endif; ?>
     </div>
     <div class="mini-cart" id="miniCart" aria-hidden="true">
       <div class="mini-inner">
@@ -73,7 +82,7 @@
       <div class="cart-summary" style="background: #fff; padding: 20px; border-radius: 8px; text-align: right;">
         <h3>Tổng tiền: <span class="cart-page-total">0₫</span></h3>
         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
-          <a href="category.php" class="btn" style="background: #ccc; color: #000;">Tiếp tục mua sắm</a>
+          <a href="index.php" class="btn" style="background: #ccc; color: #000;">Tiếp tục mua sắm</a>
           <a href="thanhtoan.php" class="btn btn-primary">Thanh toán</a>
         </div>
       </div>

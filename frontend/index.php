@@ -1,3 +1,9 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+require_once("../connect.php");
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -9,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body>
+<body<?php if ($isLoggedIn): ?> data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>"<?php endif; ?>>
 
   <header class="site-header">
     <div class="container header-inner">
@@ -20,26 +26,77 @@
         <ul class="menu">
           <li class="active"><a href="index.php">Trang chủ</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle">Thú cưng <span style="font-size:12px">▼</span></a>
+            <a href="pet.php" class="dropdown-toggle">Thú cưng <span class="caret" style="font-size:12px">▼</span></a>
             <ul class="dropdown-menu">
-              <li><a href="alaska.php">Chó Alaska Malamute</a></li>
-              <li><a href="beagle.php">Chó Beagle</a></li>
-              <li><a href="corgi.php">Chó Corgi</a></li>
-              <li><a href="golden.php">Chó Golden Retriever</a></li>
-              <li><a href="husky.php">Chó Husky Siberian</a></li>
-              <li><a href="pomeranian.php">Chó Phốc Sóc – Pomeranian</a></li>
-              <li><a href="poodle.php">Chó Poodle</a></li>
-              <li><a href="pug.php">Chó Pug</a></li>
-              <li><a href="samoyed.php">Chó Samoyed</a></li>
-              <li><a href="meoanhlongdai.php">Mèo Anh (Dài + Ngắn)</a></li>
-              <li><a href="meochanngan.php">Mèo Chân Ngắn</a></li>
-              <li><a href="meotaicup.php">Mèo Tai Cụp</a></li>
+              <?php
+                // Hiển thị các giống chó từ DB, chỉ loại DOG
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $breedSql = "SELECT id, name FROM breeds WHERE pet_type='DOG' ORDER BY name ASC";
+                  if ($breedRes = $conn->query($breedSql)) {
+                    if ($breedRes->num_rows > 0) {
+                      while ($br = $breedRes->fetch_assoc()) {
+                        $bid = (int)$br['id'];
+                        $bname = htmlspecialchars($br['name']);
+                        echo '<div><a href="pet.php?breed_id=' . $bid . '">Chó ' . $bname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có giống chó</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải giống chó</span></div>';
+                  }
+                }
+
+                // Hiển thị các giống mèo từ DB, chỉ loại CAT
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $catSql = "SELECT id, name FROM breeds WHERE pet_type='CAT' ORDER BY name ASC";
+                  if ($catRes = $conn->query($catSql)) {
+                    if ($catRes->num_rows > 0) {
+                      while ($cr = $catRes->fetch_assoc()) {
+                        $cid = (int)$cr['id'];
+                        $cname = htmlspecialchars($cr['name']);
+                        echo '<div><a href="pet.php?breed_id=' . $cid . '">Mèo ' . $cname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có giống mèo</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải giống mèo</span></div>';
+                  }
+                }
+              ?>
             </ul>
           </li>
-          <li><a href="category.php">Phụ kiện</a></li>
-          <li><a href="#">Dịch vụ</a></li>
+          <li class="dropdown">
+            <a href="category.php" class="dropdown-toggle">Phụ kiện <span class="caret" style="font-size:12px">▼</span></a>
+            <ul class="dropdown-menu">
+              <?php
+                // Hiển thị các loại phụ kiện từ DB (bảng categories), chỉ type ACCESSORY
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $accCatSql = "SELECT id, name FROM categories WHERE type='ACCESSORY' ORDER BY name ASC";
+                  if ($accCatRes = $conn->query($accCatSql)) {
+                    if ($accCatRes->num_rows > 0) {
+                      while ($ac = $accCatRes->fetch_assoc()) {
+                        $aid = (int)$ac['id'];
+                        $aname = htmlspecialchars($ac['name']);
+                        echo '<div><a href="category.php?category_id=' . $aid . '">Phụ kiện ' . $aname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có loại phụ kiện</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải loại phụ kiện</span></div>';
+                  }
+                }
+              ?>
+            </ul>
+          </li>
+          <!--
           <li><a href="#">Giới thiệu</a></li>
-          <li><a href="#">Liên hệ</a></li>
+          <li><a href="#">Liên hệ</a></li>-->
         </ul>
       </nav>
       <div class="header-actions">
@@ -51,8 +108,13 @@
       </div>
     </div>
     <div class="auth-links">
-      <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
-      <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php if ($isLoggedIn): ?>
+        <span style="margin-right: 15px; color: #333;">Xin chào, <strong><?php echo htmlspecialchars($userName); ?></strong></span>
+        <a href="logout.php" class="btn-login">Đăng xuất</a>
+      <?php else: ?>
+        <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
+        <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php endif; ?>
     </div>
     <div class="mini-cart" id="miniCart" aria-hidden="true">
       <div class="mini-inner">
@@ -87,7 +149,7 @@
     </div>
     <!-- Banner Slider End -->
 
-    <!-- Search & Filter moved below banner -->
+<!--    
     <div class="container header-search-bar" style="margin-top: 0;">
       <div class="search-wrap">
         <select class="cat-select"><option>Tất cả danh mục</option></select>
@@ -97,8 +159,7 @@
     </div>
     </header>
 
-  <main>
-    <!-- Hero (dùng ảnh bạn upload làm preview) -->
+    
     <section class="hero container">
       <div class="hero-left">
         <h1>Chăm sóc & yêu thương thú cưng của bạn</h1>
@@ -110,16 +171,16 @@
       </div>
     </section>
 
-    <!-- Breadcrumb -->
+    
     <section class="breadcrumb container">
       <span>Trang chủ</span> <span class="sep">|</span> <span>Danh mục sản phẩm</span>
     </section>
-
+-->
     <!-- New products (populated from site content) -->
     <section id="products" class="container products-section">
-      <h2 class="section-title">SẢN PHẨM MỚI</h2>
+      <h2 class="section-title">Thú Cưng</h2>
 
-      <!-- Chỗ code lọc sản phẩm -->
+      <!-- Chỗ code lọc sản phẩm 
     <div class="filter-bar">
         <select id="filter-type">
             <option value="">Lọc theo loại</option>
@@ -146,92 +207,121 @@
             <option value="high">Trên 20 triệu</option>
         </select>
 
-    <button id="filter-btn" class="btn btn-primary">Lọc</button>
-</div>
+      <button id="filter-btn" class="btn btn-primary">Lọc</button>
+    </div>
+    -->
       <div class="products-grid">
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=GOLDEN+ĐẸP+TRAI" alt="GOLDEN ĐẸP TRAI"></div>
-          <h3 class="title">GOLDEN ĐẸP TRAI</h3>
-          <div class="price">15.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="golden-dep-trai">Mua hàng</button>
-            <button class="btn btn-outline view-product-btn" data-id="golden-dep-trai" data-name="GOLDEN ĐẸP TRAI" data-price="15.000.000₫" data-image="https://placehold.co/600x500?text=GOLDEN+ĐẸP+TRAI">Xem</button>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=SAMOYED+XINH" alt="SAMOYED XINH"></div>
-          <h3 class="title">SAMOYED XINH</h3>
-          <div class="price">14.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="samoyed-xinh">Mua hàng</button>
-            <button class="btn btn-outline view-product-btn" data-id="samoyed-xinh" data-name="SAMOYED XINH" data-price="14.000.000₫" data-image="https://placehold.co/600x500?text=SAMOYED+XINH">Xem</button>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=ALASKA+XAM+CUNG" alt="ALASKA XÁM CƯNG"></div>
-          <h3 class="title">ALASKA XÁM CƯNG</h3>
-          <div class="price">24.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="alaska-xam-cung">Mua hàng</button>
-            <button class="btn btn-outline view-product-btn" data-id="alaska-xam-cung" data-name="ALASKA XÁM CƯNG" data-price="24.000.000₫" data-image="https://placehold.co/600x500?text=ALASKA+XAM+CUNG">Xem</button>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=BAC+KINH+SIEU+BEO" alt="BẮC KINH SIÊU BÉO"></div>
-          <h3 class="title">BẮC KINH SIÊU BÉO</h3>
-          <div class="meta">ID: WEBSITE1758107906</div>
-          <div class="price">7.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="bac-kinh-sieu-beo">Mua hàng</button>
-            <button class="btn btn-outline view-product-btn" data-id="bac-kinh-sieu-beo" data-name="BẮC KINH SIÊU BÉO" data-price="7.000.000₫" data-image="https://placehold.co/600x500?text=BAC+KINH+SIEU+BEO">Xem</button>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=BICHON+TRANG" alt="BICHON TRẮNG XINH XINH"></div>
-          <h3 class="title">BICHON TRẮNG XINH XINH</h3>
-          <div class="price">30.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="bichon-trang">Mua hàng</button>
-            <button class="btn btn-outline view-product-btn" data-id="bichon-trang" data-name="BICHON TRẮNG XINH XINH" data-price="30.000.000₫" data-image="https://placehold.co/600x500?text=BICHON+TRANG">Xem</button>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=PHOC+SOC" alt="PHỐC SÓC BÉ XÍU CƯNG XĨU"></div>
-          <h3 class="title">PHỐC SÓC BÉ XÍU CƯNG XĨU</h3>
-          <div class="price">20.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="phoc-soc">Mua hàng</button>
-            <a class="btn btn-outline" href="product.php">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=SAMOYED+TRANG" alt="SAMOYED TRẮNG TINH XINH YÊU"></div>
-          <h3 class="title">SAMOYED TRẮNG TINH XINH YÊU</h3>
-          <div class="price">16.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="samoyed-trang">Mua hàng</button>
-            <a class="btn btn-outline" href="product.php">Xem</a>
-          </div>
-        </article>
-
-        <article class="product-card">
-          <div class="thumb"><img src="https://placehold.co/600x500?text=MEO+GOLDEN+LUN" alt="MÈO GOLDEN LÙN"></div>
-          <h3 class="title">MÈO GOLDEN LÙN</h3>
-          <div class="price">21.000.000₫</div>
-          <div class="actions">
-            <button class="btn add-to-cart" data-id="meo-golden-lun">Mua hàng</button>
-            <a class="btn btn-outline" href="product.php">Xem</a>
-          </div>
-        </article>
-
+        <?php
+          require_once("../connect.php");
+          if ($conn && !$conn->connect_error) {
+            $conn->set_charset("utf8mb4");
+            $sql = "SELECT p.id, p.name, p.price, p.stock, p.status, p.description, p.age_months, p.color, p.size, p.gender,
+                           b.name AS breed_name,
+                           (SELECT image_url FROM images i
+                            WHERE i.item_type='PET' AND i.item_id=p.id
+                            ORDER BY is_primary DESC, display_order ASC, id ASC
+                            LIMIT 1) AS image_url
+                    FROM pets p
+                    LEFT JOIN breeds b ON p.breed_id = b.id
+                    WHERE p.stock > 0
+                    ORDER BY p.created_at DESC, p.id DESC
+                    LIMIT 8";
+            $res = $conn->query($sql);
+            if ($res && $res->num_rows > 0) {
+              while ($row = $res->fetch_assoc()) {
+                $img = $row['image_url'] ? ('../' . $row['image_url']) : ('https://placehold.co/600x500?text=' . rawurlencode($row['name']));
+                $price = number_format((float)$row['price'], 0, ',', '.') . '₫';
+                
+                // Chuẩn bị dữ liệu cho modal
+                $dataAttrs = 'data-id="pet-' . (int)$row['id'] . '" ';
+                $dataAttrs .= 'data-name="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-price="' . htmlspecialchars($price, ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-image="' . htmlspecialchars($img, ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-breed="' . htmlspecialchars($row['breed_name'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-age="' . ($row['age_months'] ? $row['age_months'] . ' tháng' : 'Chưa rõ') . '" ';
+                $dataAttrs .= 'data-color="' . htmlspecialchars($row['color'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-size="' . htmlspecialchars($row['size'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
+                $dataAttrs .= 'data-gender="' . ($row['gender'] === 'MALE' ? 'Đực' : ($row['gender'] === 'FEMALE' ? 'Cái' : 'Chưa rõ')) . '" ';
+                $dataAttrs .= 'data-status="' . ($row['status'] === 'AVAILABLE' ? 'Còn hàng' : ($row['status'] === 'SOLD' ? 'Đã bán' : 'Không khả dụng')) . '" ';
+                $dataAttrs .= 'data-description="' . htmlspecialchars($row['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
+                
+                echo '<article class="product-card">';
+                echo '  <div class="thumb"><img src="' . htmlspecialchars($img) . '" alt="' . htmlspecialchars($row['name']) . '"></div>';
+                echo '  <h3 class="title">' . htmlspecialchars($row['name']) . '</h3>';
+                if (!empty($row['breed_name'])) {
+                  echo '  <div class="meta">' . htmlspecialchars($row['breed_name']) . '</div>';
+                }
+                echo '  <div class="price">' . $price . '</div>';
+                echo '  <div class="actions">';
+                echo '    <button class="btn add-to-cart" data-id="pet-' . (int)$row['id'] . '" data-stock="' . (int)$row['stock'] . '">Mua hàng</button>';
+                echo '    <button class="btn btn-outline view-product-btn" ' . $dataAttrs . '>Xem</button>';
+                echo '  </div>';
+                echo '</article>';
+              }
+            } else {
+              echo '<p>Chưa có thú cưng nào trong hệ thống.</p>';
+            }
+          } else {
+            echo '<p>Lỗi kết nối CSDL. Vui lòng kiểm tra cấu hình trong connect.php</p>';
+          }
+        ?>
       </div>
-      <div class="more center"><a class="btn" href="category.php">Xem thêm</a></div>
+      <div class="more center"><a class="btn" href="pet.php">Xem thêm</a></div>
+      <h2 class="section-title">Phụ kiện</h2>
+      <div class="products-grid">
+          <?php
+            // Hiển thị danh sách phụ kiện
+            if (isset($conn) && !$conn->connect_error) {
+              $sqlA = "SELECT a.id, a.name, a.price, a.stock, a.status, a.description, a.brand, a.material, a.size,
+                              (SELECT image_url FROM images i
+                               WHERE i.item_type='ACCESSORY' AND i.item_id=a.id
+                               ORDER BY is_primary DESC, display_order ASC, id ASC
+                               LIMIT 1) AS image_url
+                       FROM accessories a
+                       WHERE a.stock > 0
+                       ORDER BY a.created_at DESC, a.id DESC
+                       LIMIT 8";
+              $resA = $conn->query($sqlA);
+              if ($resA && $resA->num_rows > 0) {
+                while ($rowA = $resA->fetch_assoc()) {
+                  $imgA = $rowA['image_url'] ? ('../' . $rowA['image_url']) : ('https://placehold.co/600x500?text=' . rawurlencode($rowA['name']));
+                  $priceA = number_format((float)$rowA['price'], 0, ',', '.') . '₫';
+                  $statusText = ($rowA['status'] === 'ACTIVE') ? 'Đang bán' : (($rowA['status'] === 'OUT_OF_STOCK') ? 'Hết hàng' : 'Ngừng bán');
+
+                  // Dữ liệu cho modal phụ kiện (modal riêng)
+                  $dataAttrsA = 'data-id="acc-' . (int)$rowA['id'] . '" ';
+                  $dataAttrsA .= 'data-name="' . htmlspecialchars($rowA['name'], ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-price="' . htmlspecialchars($priceA, ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-image="' . htmlspecialchars($imgA, ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-brand="' . htmlspecialchars($rowA['brand'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-material="' . htmlspecialchars($rowA['material'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-size="' . htmlspecialchars($rowA['size'] ?: '—', ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-status="' . htmlspecialchars($statusText, ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-description="' . htmlspecialchars($rowA['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
+
+                  echo '<article class="product-card">';
+                  echo '  <div class="thumb"><img src="' . htmlspecialchars($imgA) . '" alt="' . htmlspecialchars($rowA['name']) . '"></div>';
+                  echo '  <h3 class="title">' . htmlspecialchars($rowA['name']) . '</h3>';
+                  if (!empty($rowA['brand'])) {
+                    echo '  <div class="meta">' . htmlspecialchars($rowA['brand']) . '</div>';
+                  }
+                  echo '  <div class="price">' . $priceA . '</div>';
+                  echo '  <div class="actions">';
+                  echo '    <button class="btn add-to-cart" data-id="acc-' . (int)$rowA['id'] . '" data-stock="' . (int)$rowA['stock'] . '">Mua hàng</button>';
+                  echo '    <button class="btn btn-outline view-accessory-btn" ' . $dataAttrsA . '>Xem</button>';
+                  echo '  </div>';
+                  echo '</article>';
+                }
+              } else {
+                echo '<p>Chưa có phụ kiện nào trong hệ thống.</p>';
+              }
+            } else {
+              echo '<p>Lỗi kết nối CSDL. Vui lòng kiểm tra cấu hình trong connect.php</p>';
+            }
+          ?>
+        </div>
+        <div class="more center"><a class="btn" href="category.php">Xem thêm</a></div>
+
     </section>
 
   </main>
@@ -282,6 +372,7 @@
   <script src="../assets/js/script.js"></script>
   <script src="../assets/js/cart.js"></script>
   <script src="../assets/js/product-modal.js"></script>
+  <script src="../assets/js/accessory-modal.js"></script>
     <script>
       // Fallback slider script (ensures slider always works)
       document.addEventListener('DOMContentLoaded', function() {

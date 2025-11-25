@@ -40,7 +40,11 @@ class ProductModal {
                     <td id="modalProductAge">-</td>
                   </tr>
                   <tr>
-                    <td>Cân nặng:</td>
+                    <td>Giới tính:</td>
+                    <td id="modalProductGender">-</td>
+                  </tr>
+                  <tr>
+                    <td>Kích cỡ:</td>
                     <td id="modalProductWeight">-</td>
                   </tr>
                   <tr>
@@ -99,7 +103,19 @@ class ProductModal {
         const productName = e.target.getAttribute('data-name');
         const productPrice = e.target.getAttribute('data-price');
         const productImage = e.target.getAttribute('data-image');
-        this.showProduct(productId, productName, productPrice, productImage);
+        
+        // Lấy thông tin chi tiết từ data attributes
+        const productData = {
+          description: e.target.getAttribute('data-description'),
+          breed: e.target.getAttribute('data-breed'),
+          age: e.target.getAttribute('data-age'),
+          color: e.target.getAttribute('data-color'),
+          size: e.target.getAttribute('data-size'),
+          gender: e.target.getAttribute('data-gender'),
+          status: e.target.getAttribute('data-status')
+        };
+        
+        this.showProduct(productId, productName, productPrice, productImage, productData);
       }
     });
 
@@ -122,26 +138,35 @@ class ProductModal {
     });
   }
 
-  showProduct(productId, productName, productPrice, productImage) {
+  showProduct(productId, productName, productPrice, productImage, productData = {}) {
     // Đặt thông tin cơ bản (từ attributes/button data)
     this.modal.setAttribute('data-product-id', productId);
     this.modal.querySelector('#modalProductName').textContent = productName;
     this.modal.querySelector('#modalProductPrice').textContent = productPrice;
     this.modal.querySelector('#modalProductImage').src = productImage;
 
-    // TODO: Sau này backend sẽ fill những thông tin này vào bằng API
-    // Ví dụ:
-    // fetch(`/api/products/${productId}`)
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     this.modal.querySelector('#modalProductDescription').textContent = data.description;
-    //     this.modal.querySelector('#modalProductBreed').textContent = data.breed;
-    //     this.modal.querySelector('#modalProductAge').textContent = data.age;
-    //     this.modal.querySelector('#modalProductWeight').textContent = data.weight;
-    //     this.modal.querySelector('#modalProductColor').textContent = data.color;
-    //     this.modal.querySelector('#modalProductStatus').textContent = data.status;
-    //     this.modal.querySelector('#modalProductRating').textContent = `(${data.reviews || 0} đánh giá)`;
-    //   });
+    // Cập nhật thông tin chi tiết từ data attributes
+    if (productData.description) {
+      this.modal.querySelector('#modalProductDescription').textContent = productData.description;
+    }
+    if (productData.breed) {
+      this.modal.querySelector('#modalProductBreed').textContent = productData.breed;
+    }
+    if (productData.age) {
+      this.modal.querySelector('#modalProductAge').textContent = productData.age;
+    }
+    if (productData.gender) {
+      this.modal.querySelector('#modalProductGender').textContent = productData.gender;
+    }
+    if (productData.color) {
+      this.modal.querySelector('#modalProductColor').textContent = productData.color;
+    }
+    if (productData.size) {
+      this.modal.querySelector('#modalProductWeight').textContent = productData.size;
+    }
+    if (productData.status) {
+      this.modal.querySelector('#modalProductStatus').textContent = productData.status;
+    }
 
     // Hiển thị modal
     this.open();

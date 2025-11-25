@@ -1,3 +1,14 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+
+// Yêu cầu đăng nhập để thanh toán
+if (!$isLoggedIn) {
+    header("Location: login.php?redirect=thanhtoan.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,7 +17,7 @@
   <title>Thanh toán - StarryPets</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body>
+<body data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="index.php">
@@ -33,7 +44,6 @@
             </ul>
           </li>
           <li><a href="category.php">Phụ kiện</a></li>
-          <li><a href="dichvu.php">Dịch vụ</a></li>
           <li><a href="gioithieu.php">Giới thiệu</a></li>
           <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
@@ -47,8 +57,13 @@
       </div>
     </div>
     <div class="auth-links">
-      <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
-      <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php if ($isLoggedIn): ?>
+        <span style="margin-right: 15px; color: #333;">Xin chào, <strong><?php echo htmlspecialchars($userName); ?></strong></span>
+        <a href="logout.php" class="btn-login">Đăng xuất</a>
+      <?php else: ?>
+        <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
+        <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php endif; ?>
     </div>
     <div class="mini-cart" id="miniCart" aria-hidden="true">
       <div class="mini-inner">
@@ -176,7 +191,9 @@
     <script>
       // Hiển thị tóm tắt đơn hàng
       function renderCheckoutSummary() {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const userId = document.body.getAttribute('data-user-id');
+        const cartKey = userId ? `cart_user_${userId}` : 'cart_guest';
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         const orderSummary = document.getElementById("orderSummary");
         const subtotal = document.getElementById("subtotal");
         const orderTotal = document.getElementById("orderTotal");
@@ -207,8 +224,10 @@
       }
 
       // Đặt hàng
-      function placeOrder() {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      async function placeOrder() {
+        const userId = document.body.getAttribute('data-user-id');
+        const cartKey = userId ? `cart_user_${userId}` : 'cart_guest';
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         
         if (cart.length === 0) {
           alert("Giỏ hàng trống!");
@@ -228,31 +247,82 @@
           return;
         }
 
-        // Tạo đơn hàng
-        const order = {
-          id: "ORD" + Date.now(),
-          date: new Date().toLocaleString('vi-VN'),
-          customer: { fullName, email, phone, address, city, notes },
-          items: cart,
-          total: cart.reduce((sum, item) => sum + item.qty * item.price, 0) + 30000,
+        // Chuẩn bị dữ liệu gửi lên server
+        const orderData = {
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          address: address,
+          city: city,
+          notes: notes,
           payment: payment,
-          status: "Chờ xác nhận"
+          items: cart
         };
 
-        // Lưu đơn hàng
-        let orders = JSON.parse(localStorage.getItem("orders")) || [];
-        orders.push(order);
-        localStorage.setItem("orders", JSON.stringify(orders));
+        try {
+          // Gửi request lên server
+          console.log('Sending order data:', orderData);
+          
+          const response = await fetch('process_order.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+          });
 
-        // Xóa giỏ hàng
-        localStorage.removeItem("cart");
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
 
-        alert(`✅ Đặt hàng thành công!\\nMã đơn hàng: ${order.id}\\n\\nCảm ơn bạn đã mua sắm tại StarryPets!`);
-        
-        // Quay lại trang chủ
-        setTimeout(() => {
-          window.location.href = "index.php";
-        }, 1000);
+          // Đọc response dưới dạng text trước để debug
+          const responseText = await response.text();
+          console.log('Raw response:', responseText);
+
+          let result;
+          try {
+            result = JSON.parse(responseText);
+          } catch (e) {
+            console.error('JSON parse error:', e);
+            console.error('Response was:', responseText);
+            alert("❌ Server trả về lỗi: " + responseText.substring(0, 500));
+            return;
+          }
+
+          console.log('Response data:', result);
+
+          if (result.success) {
+            // Lưu đơn hàng vào localStorage để theo dõi
+            const ordersKey = `orders_user_${userId}`;
+            let orders = JSON.parse(localStorage.getItem(ordersKey)) || [];
+            orders.push({
+              id: result.order_code,
+              order_id: result.order_id,
+              date: new Date().toLocaleString('vi-VN'),
+              customer: { fullName, email, phone, address, city, notes },
+              items: cart,
+              total: cart.reduce((sum, item) => sum + item.qty * item.price, 0) + 30000,
+              payment: payment,
+              status: "Chờ xác nhận"
+            });
+            localStorage.setItem(ordersKey, JSON.stringify(orders));
+
+            // Xóa giỏ hàng của user
+            localStorage.removeItem(cartKey);
+
+            alert(`✅ Đặt hàng thành công!\\nMã đơn hàng: ${result.order_code}\\n\\nCảm ơn bạn đã mua sắm tại StarryPets!`);
+            
+            // Quay lại trang chủ
+            setTimeout(() => {
+              window.location.href = "index.php";
+            }, 1000);
+          } else {
+            alert("❌ Đặt hàng thất bại: " + result.message);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          console.error('Error details:', error.message, error.stack);
+          alert("❌ Có lỗi xảy ra khi đặt hàng. Vui lòng kiểm tra console để xem chi tiết lỗi!");
+        }
       }
 
       // Hiển thị khi tải trang

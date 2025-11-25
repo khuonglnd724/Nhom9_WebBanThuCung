@@ -1,20 +1,14 @@
 <?php
-// Kết nối database
-$db_host = '127.0.0.1';
-$db_user = 'root';
-$db_pass = '';
-$db_name = 'pet';
-
-$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
+require_once("../connect.php");
 
 // Kiểm tra lỗi kết nối
-if ($mysqli->connect_error) {
-    $error_msg = $mysqli->connect_error;
+if ($conn->connect_error) {
+    $error_msg = $conn->connect_error;
     
     // Nếu lỗi "using password: NO", hướng dẫn start MySQL
     if (strpos($error_msg, 'using password: NO') !== false || 
         strpos($error_msg, 'Connection refused') !== false) {
-        die("<h2>❌ Lỗi: MySQL Server không chạy!</h2>
+        die("<h2>Lỗi: MySQL Server không chạy!</h2>
             <p>Vui lòng:</p>
             <ol>
                 <li>Mở XAMPP Control Panel</li>
@@ -24,17 +18,17 @@ if ($mysqli->connect_error) {
             <p>Chi tiết lỗi: " . htmlspecialchars($error_msg) . "</p>");
     }
     
-    die("❌ Kết nối CSDL thất bại: " . htmlspecialchars($error_msg));
+    die("Kết nối CSDL thất bại: " . htmlspecialchars($error_msg));
 }
 
-$mysqli->set_charset("utf8mb4");
+$conn->set_charset("utf8mb4");
 
 // Xử lý form đăng nhập
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = $_POST['username']; // Dùng email để đăng nhập
     $password = $_POST['password'];
 
-    $stmt = $mysqli->prepare("SELECT id, full_name, email, password_hash, role FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, full_name, email, password_hash, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -43,10 +37,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
         $user = $result->fetch_assoc();
         // Kiểm tra password với bcrypt hash
         if (password_verify($password, $user['password_hash'])) {
-            echo "<script>
-                alert('Đăng nhập thành công!');
-                window.location.href = 'index.php';
-            </script>";
+            // Khởi tạo session để lưu thông tin người dùng
+            session_start();
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['full_name'];
+            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_role'] = $user['role'];
+            
+            // Chuyển hướng theo role
+            if ($user['role'] == 'ADMIN') {
+                echo "<script>
+                    alert('Đăng nhập thành công! Chào mừng Admin.');
+                    window.location.href = '../admin/index.php';
+                </script>";
+            } else {
+                echo "<script>
+                    alert('Đăng nhập thành công!');
+                    window.location.href = 'index.php';
+                </script>";
+            }
             exit();
         } else {
             echo "<script>alert('Đăng nhập thất bại! Sai email hoặc mật khẩu.');</script>";
@@ -66,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
     // Hash password bằng bcrypt
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-    $stmt = $mysqli->prepare("INSERT INTO users (full_name, email, phone, password_hash, role, status) VALUES (?, ?, ?, ?, 'CUSTOMER', 'ACTIVE')");
+    $stmt = $conn->prepare("INSERT INTO users (full_name, email, phone, password_hash, role, status) VALUES (?, ?, ?, ?, 'CUSTOMER', 'ACTIVE')");
     $stmt->bind_param("ssss", $full_name, $email, $phone, $password_hash);
     $register_success = $stmt->execute();
 
@@ -91,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['forgot'])) {
     $email = $_POST['forgot_email'];
 
-    $stmt = $mysqli->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
