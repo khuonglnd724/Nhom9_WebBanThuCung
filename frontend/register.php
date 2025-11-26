@@ -1,5 +1,5 @@
 <?php
-// Redirect sang trang login.php để sử dụng giao diện đẹp hơn
-header('Location: login.php');
+// Điều hướng sang trang login.php và mở panel Đăng ký
+header('Location: login.php?panel=register');
 exit();
 ?>
