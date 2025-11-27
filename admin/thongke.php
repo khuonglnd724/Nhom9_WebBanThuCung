@@ -43,10 +43,10 @@ $stmt->execute();
 $ordersByStatus = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Total products (pets + accessories)
+// Total products (pets + accessories) with stock > 0
 $stmt = $conn->prepare("SELECT 
-    (SELECT COUNT(*) FROM pets) as total_pets,
-    (SELECT COUNT(*) FROM accessories) as total_accessories");
+    (SELECT COUNT(*) FROM pets WHERE stock > 0) as total_pets,
+    (SELECT COUNT(*) FROM accessories WHERE stock > 0) as total_accessories");
 $stmt->execute();
 $products = $stmt->get_result()->fetch_assoc();
 $totalPets = $products['total_pets'] ?? 0;
@@ -67,6 +67,10 @@ $stmt = $conn->prepare("SELECT
         WHEN 'pet' THEN (SELECT p.name FROM pets p WHERE p.id = od.item_id)
         WHEN 'accessory' THEN (SELECT a.name FROM accessories a WHERE a.id = od.item_id)
     END as item_name,
+    CASE od.item_type 
+        WHEN 'pet' THEN (SELECT c.name FROM pets p JOIN categories c ON p.category_id = c.id WHERE p.id = od.item_id)
+        WHEN 'accessory' THEN (SELECT c.name FROM accessories a JOIN categories c ON a.category_id = c.id WHERE a.id = od.item_id)
+    END as category_name,
     COUNT(*) as sold_count,
     SUM(od.quantity) as total_quantity
 FROM order_details od
@@ -217,7 +221,7 @@ $statusLabels = [
                     <?php foreach ($topItems as $item): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($item['item_name'] ?? 'N/A'); ?></td>
-                        <td><?php echo $item['item_type'] === 'pet' ? 'Thú cưng' : 'Phụ kiện'; ?></td>
+                        <td><?php echo htmlspecialchars($item['category_name'] ?? 'N/A'); ?></td>
                         <td><?php echo number_format($item['total_quantity'], 0, ',', '.'); ?></td>
                     </tr>
                     <?php endforeach; ?>
