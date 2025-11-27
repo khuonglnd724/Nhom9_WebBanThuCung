@@ -6,25 +6,65 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Helper: create URL-friendly slug from a name
+function make_slug($str) {
+    $str = trim($str);
+    // Try transliteration
+    $slug = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+    if ($slug === false || $slug === null) {
+        $slug = $str; // fallback
+    }
+    $slug = strtolower($slug);
+    // Replace non-alphanumeric with hyphens
+    $slug = preg_replace('/[^a-z0-9]+/i', '-', $slug);
+    // Trim hyphens
+    $slug = trim($slug, '-');
+    // Fallback if empty
+    if ($slug === '') {
+        $slug = 'cat-' . time();
+    }
+    return $slug;
+}
+
 // Xử lý danh mục mới nếu được chọn
 $category_id = isset($_POST['category_id']) ? $_POST['category_id'] : null;
 $new_category_name = isset($_POST['new_category_name']) ? trim($_POST['new_category_name']) : '';
 
 if ($category_id === 'new' && !empty($new_category_name)) {
-    // Thêm danh mục mới vào database
-    $insert_cat_sql = "INSERT INTO categories (name, created_at) VALUES (?, NOW())";
+    // Tạo slug và thêm danh mục mới vào database với các cột bắt buộc
+    $slug = make_slug($new_category_name);
+    $insert_cat_sql = "INSERT INTO categories (name, slug, type, parent_id, created_at) VALUES (?, ?, 'ACCESSORY', NULL, NOW())";
     $cat_stmt = $conn->prepare($insert_cat_sql);
-    $cat_stmt->bind_param('s', $new_category_name);
-    $cat_stmt->execute();
-    $category_id = $conn->insert_id;
-    $cat_stmt->close();
+    if (!$cat_stmt) {
+        die('Lỗi khởi tạo truy vấn danh mục: ' . $conn->error);
+    }
+    $cat_stmt->bind_param('ss', $new_category_name, $slug);
+    if (!$cat_stmt->execute()) {
+        // Nếu trùng slug, thử lấy lại id danh mục đã tồn tại
+        $cat_stmt->close();
+        $find_sql = "SELECT id FROM categories WHERE slug = ? LIMIT 1";
+        $find_stmt = $conn->prepare($find_sql);
+        if ($find_stmt) {
+            $find_stmt->bind_param('s', $slug);
+            $find_stmt->execute();
+            $res = $find_stmt->get_result();
+            $row = $res ? $res->fetch_assoc() : null;
+            $category_id = $row['id'] ?? 0;
+            $find_stmt->close();
+        } else {
+            $category_id = 0;
+        }
+    } else {
+        $category_id = $conn->insert_id;
+        $cat_stmt->close();
+    }
 } else {
     $category_id = (int)$category_id;
 }
 
 // Lấy dữ liệu từ form
 $name = trim($_POST['name'] ?? '');
-$type = trim($_POST['type'] ?? 'ACCESSORY');
+$type = 'ACCESSORY'; // accessories luôn có type ACCESSORY
 $brand = trim($_POST['brand'] ?? '');
 $material = trim($_POST['material'] ?? '');
 $size = trim($_POST['size'] ?? '');
@@ -36,6 +76,17 @@ $status = $_POST['status'] ?? 'AVAILABLE';
 // Validate
 if (empty($name) || $category_id <= 0 || $price <= 0) {
     die('Vui lòng điền đầy đủ thông tin bắt buộc!');
+}
+
+// Chuẩn hóa trạng thái theo enum của bảng accessories: ACTIVE, INACTIVE, OUT_OF_STOCK
+$status = strtoupper(trim($status));
+if ($status === 'AVAILABLE') { // map từ form cũ
+    $status = 'ACTIVE';
+} elseif ($status === 'HIDDEN') {
+    $status = 'INACTIVE';
+}
+if (!in_array($status, ['ACTIVE','INACTIVE','OUT_OF_STOCK'], true)) {
+    $status = 'ACTIVE';
 }
 
 // Xử lý upload ảnh
@@ -72,11 +123,14 @@ $conn->begin_transaction();
 
 try {
     // Insert vào bảng accessories
-    $sql = "INSERT INTO accessories (category_id, name, type, brand, material, size, description, price, stock, status, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+    $sql = "INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock, status, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('issssssdis', $category_id, $name, $type, $brand, $material, $size, $description, $price, $stock, $status);
+    if (!$stmt) {
+        throw new Exception('Lỗi prepare accessories: ' . $conn->error);
+    }
+    $stmt->bind_param('isssssdis', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi thêm phụ kiện: ' . $stmt->error);
