@@ -15,29 +15,80 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="index.php">
-        <img src="../assets/images/logo1.png" alt="StarryPets Logo" style="height:100px;width:auto;">
+        <img src="../assets/images/logo.png" alt="StarryPets Logo" style="height:100px;width:auto;">
       </a>
       <nav class="main-nav" id="mainNav">
         <ul class="menu">
-          <li><a href="index.php">Trang chủ</a></li>
+          <li class="active"><a href="index.php">Trang chủ</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle">Thú cưng <span style="font-size:12px">▼</span></a>
+            <a href="pet.php" class="dropdown-toggle">Thú cưng <span class="caret" style="font-size:12px">▼</span></a>
             <ul class="dropdown-menu">
-              <li><a href="alaska.php">Chó Alaska Malamute</a></li>
-              <li><a href="beagle.php">Chó Beagle</a></li>
-              <li><a href="corgi.php">Chó Corgi</a></li>
-              <li><a href="golden.php">Chó Golden Retriever</a></li>
-              <li><a href="husky.php">Chó Husky Siberian</a></li>
-              <li><a href="pomeranian.php">Chó Phốc Sóc – Pomeranian</a></li>
-              <li><a href="poodle.php">Chó Poodle</a></li>
-              <li><a href="pug.php">Chó Pug</a></li>
-              <li><a href="samoyed.php">Chó Samoyed</a></li>
-              <li><a href="meoanhlongdai.php">Mèo Anh (Dài + Ngắn)</a></li>
-              <li><a href="meochanngan.php">Mèo Chân Ngắn</a></li>
-              <li><a href="meotaicup.php">Mèo Tai Cụp</a></li>
+              <?php
+                // Hiển thị các giống chó từ DB, chỉ loại DOG
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $breedSql = "SELECT id, name FROM breeds WHERE pet_type='DOG' ORDER BY name ASC";
+                  if ($breedRes = $conn->query($breedSql)) {
+                    if ($breedRes->num_rows > 0) {
+                      while ($br = $breedRes->fetch_assoc()) {
+                        $bid = (int)$br['id'];
+                        $bname = htmlspecialchars($br['name']);
+                        echo '<div><a href="pet.php?breed_id=' . $bid . '">Chó ' . $bname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có giống chó</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải giống chó</span></div>';
+                  }
+                }
+
+                // Hiển thị các giống mèo từ DB, chỉ loại CAT
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $catSql = "SELECT id, name FROM breeds WHERE pet_type='CAT' ORDER BY name ASC";
+                  if ($catRes = $conn->query($catSql)) {
+                    if ($catRes->num_rows > 0) {
+                      while ($cr = $catRes->fetch_assoc()) {
+                        $cid = (int)$cr['id'];
+                        $cname = htmlspecialchars($cr['name']);
+                        echo '<div><a href="pet.php?breed_id=' . $cid . '">Mèo ' . $cname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có giống mèo</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải giống mèo</span></div>';
+                  }
+                }
+              ?>
             </ul>
           </li>
-          <li><a href="category.php">Phụ kiện</a></li>
+          <li class="dropdown">
+            <a href="category.php" class="dropdown-toggle">Phụ kiện <span class="caret" style="font-size:12px">▼</span></a>
+            <ul class="dropdown-menu">
+              <?php
+                // Hiển thị các loại phụ kiện từ DB (bảng categories), chỉ type ACCESSORY
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $accCatSql = "SELECT id, name FROM categories WHERE type='ACCESSORY' ORDER BY name ASC";
+                  if ($accCatRes = $conn->query($accCatSql)) {
+                    if ($accCatRes->num_rows > 0) {
+                      while ($ac = $accCatRes->fetch_assoc()) {
+                        $aid = (int)$ac['id'];
+                        $aname = htmlspecialchars($ac['name']);
+                        echo '<div><a href="category.php?category_id=' . $aid . '">Phụ kiện ' . $aname . '</a></div>';
+                      }
+                    } else {
+                      echo '<div><span>Chưa có loại phụ kiện</span></div>';
+                    }
+                  } else {
+                    echo '<div><span>Lỗi tải loại phụ kiện</span></div>';
+                  }
+                }
+              ?>
+            </ul>
+          </li>
           <li><a href="gioithieu.php">Giới thiệu</a></li>
           <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
