@@ -314,8 +314,8 @@ if (!$isLoggedIn) {
 
             alert(`✅ Đặt hàng thành công!\\nMã đơn hàng: ${result.order_code}\\n\\nCảm ơn bạn đã mua sắm tại StarryPets!`);
             
-            // Reload trang để đảm bảo giỏ hàng được cập nhật hoàn toàn
-            window.location.href = "index.php";
+            // Redirect đến trang xác nhận đơn hàng
+            window.location.href = `order-confirmation.php?order_id=${result.order_id}`;
           } else {
             alert("❌ Đặt hàng thất bại: " + result.message);
           }

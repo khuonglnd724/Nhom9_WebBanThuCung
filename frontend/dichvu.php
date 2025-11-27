@@ -1,3 +1,9 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+require_once("../connect.php");
+?>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -9,34 +15,58 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body>
+<body<?php if ($isLoggedIn): ?> data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>"<?php endif; ?>>
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="index.php">
-        <img src="../assets/images/logo1.png" alt="StarryPets Logo" style="height:100px;width:auto;">
+        <img src="../assets/images/logo.png" alt="StarryPets Logo" style="height:100px;width:auto;">
       </a>
       <nav class="main-nav" id="mainNav">
         <ul class="menu">
           <li><a href="index.php">Trang chủ</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle">Thú cưng <span style="font-size:12px">▼</span></a>
+            <a href="pet.php" class="dropdown-toggle">Thú cưng <span class="caret" style="font-size:12px">▼</span></a>
             <ul class="dropdown-menu">
-              <li><a href="alaska.php">Chó Alaska Malamute</a></li>
-              <li><a href="beagle.php">Chó Beagle</a></li>
-              <li><a href="corgi.php">Chó Corgi</a></li>
-              <li><a href="golden.php">Chó Golden Retriever</a></li>
-              <li><a href="husky.php">Chó Husky Siberian</a></li>
-              <li><a href="pomeranian.php">Chó Phốc Sóc – Pomeranian</a></li>
-              <li><a href="poodle.php">Chó Poodle</a></li>
-              <li><a href="pug.php">Chó Pug</a></li>
-              <li><a href="samoyed.php">Chó Samoyed</a></li>
-              <li><a href="meoanhlongdai.php">Mèo Anh (Dài + Ngắn)</a></li>
-              <li><a href="meochanngan.php">Mèo Chân Ngắn</a></li>
-              <li><a href="meotaicup.php">Mèo Tai Cụp</a></li>
+              <?php
+                if (isset($conn) && !$conn->connect_error) {
+                  $conn->set_charset('utf8mb4');
+                  $breedSql = "SELECT id, name FROM breeds WHERE pet_type='DOG' ORDER BY name ASC";
+                  if ($breedRes = $conn->query($breedSql)) {
+                    if ($breedRes->num_rows > 0) {
+                      while ($br = $breedRes->fetch_assoc()) {
+                        echo '<div><a href="pet.php?breed_id=' . (int)$br['id'] . '">Chó ' . htmlspecialchars($br['name']) . '</a></div>';
+                      }
+                    }
+                  }
+                  $catSql = "SELECT id, name FROM breeds WHERE pet_type='CAT' ORDER BY name ASC";
+                  if ($catRes = $conn->query($catSql)) {
+                    if ($catRes->num_rows > 0) {
+                      while ($cr = $catRes->fetch_assoc()) {
+                        echo '<div><a href="pet.php?breed_id=' . (int)$cr['id'] . '">Mèo ' . htmlspecialchars($cr['name']) . '</a></div>';
+                      }
+                    }
+                  }
+                }
+              ?>
             </ul>
           </li>
-          <li><a href="category.php">Phụ kiện</a></li>
-          <li class="active"><a href="dichvu.php">Dịch vụ</a></li>
+          <li class="dropdown">
+            <a href="category.php" class="dropdown-toggle">Phụ kiện <span class="caret" style="font-size:12px">▼</span></a>
+            <ul class="dropdown-menu">
+              <?php
+                if (isset($conn) && !$conn->connect_error) {
+                  $accCatSql = "SELECT id, name FROM categories WHERE type='ACCESSORY' ORDER BY name ASC";
+                  if ($accCatRes = $conn->query($accCatSql)) {
+                    if ($accCatRes->num_rows > 0) {
+                      while ($ac = $accCatRes->fetch_assoc()) {
+                        echo '<div><a href="category.php?category_id=' . (int)$ac['id'] . '">Phụ kiện ' . htmlspecialchars($ac['name']) . '</a></div>';
+                      }
+                    }
+                  }
+                }
+              ?>
+            </ul>
+          </li>
           <li><a href="gioithieu.php">Giới thiệu</a></li>
           <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
@@ -50,8 +80,13 @@
       </div>
     </div>
     <div class="auth-links">
-      <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
-      <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php if ($isLoggedIn): ?>
+        <span style="margin-right: 15px; color: #333;">Xin chào, <strong><?php echo htmlspecialchars($userName); ?></strong></span>
+        <a href="logout.php" class="btn-login">Đăng xuất</a>
+      <?php else: ?>
+        <a href="../frontend/login.php" class="btn-login">Đăng nhập</a>
+        <a href="../frontend/register.php" class="btn-register">Đăng ký</a>
+      <?php endif; ?>
     </div>
     <div class="mini-cart" id="miniCart" aria-hidden="true">
       <div class="mini-inner">
@@ -64,33 +99,25 @@
         </div>
       </div>
     </div>
-  </header>
 
-  <!-- Banner Slider Start -->
-  <div class="banner-slider">
-    <div class="slides">
-      <div class="slide active"><img src="../assets/images/banner 1.jpg" alt="Banner 1"></div>
-      <div class="slide"><img src="../assets/images/banner 2.jpg" alt="Banner 2"></div>
-      <div class="slide"><img src="../assets/images/banner 3.jpg" alt="Banner 3"></div>
-    </div>
-    <button class="slider-btn prev">&#10094;</button>
-    <button class="slider-btn next">&#10095;</button>
-    <div class="slider-dots">
-      <span class="dot active"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-  </div>
-  <!-- Banner Slider End -->
-
-    <!-- Search & Filter moved below banner -->
-    <div class="container header-search-bar" style="margin-top: 0;">
-      <div class="search-wrap">
-        <select class="cat-select"><option>Tất cả danh mục</option></select>
-        <input class="search-input" placeholder="Tìm kiếm..." />
-        <button class="btn search-btn" aria-label="search">🔍</button>
+    <!-- Banner Slider Start -->
+    <div class="banner-slider">
+      <div class="slides">
+        <div class="slide active"><img src="../assets/images/banner 1.jpg" alt="Banner 1"></div>
+        <div class="slide"><img src="../assets/images/banner 2.jpg" alt="Banner 2"></div>
+        <div class="slide"><img src="../assets/images/banner 3.jpg" alt="Banner 3"></div>
+        <div class="slide"><img src="../assets/images/banner 4.jpg" alt="Banner 4"></div>
+      </div>
+      <button class="slider-btn prev">&#10094;</button>
+      <button class="slider-btn next">&#10095;</button>
+      <div class="slider-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
       </div>
     </div>
+    <!-- Banner Slider End -->
   </header>
 
   <main>

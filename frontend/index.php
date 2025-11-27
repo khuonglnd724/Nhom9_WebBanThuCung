@@ -94,9 +94,8 @@ require_once("../connect.php");
               ?>
             </ul>
           </li>
-          <!--
-          <li><a href="#">Giới thiệu</a></li>
-          <li><a href="#">Liên hệ</a></li>-->
+          <li><a href="gioithieu.php">Giới thiệu</a></li>
+          <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -376,6 +375,7 @@ require_once("../connect.php");
   <script src="../assets/js/cart.js"></script>
   <script src="../assets/js/accessory-modal.js"></script>
   <script src="../assets/js/product-modal-handler.js"></script>
+  <script src="../assets/js/accessory-modal-handler.js"></script>
   <script>
       // Fallback slider script (ensures slider always works)
       document.addEventListener('DOMContentLoaded', function() {
