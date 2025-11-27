@@ -225,6 +225,8 @@ body.mobile-open .main-nav .menu{flex-direction:column;gap:6px}
   margin-left: 12px;
   transition: box-shadow 0.2s;
   min-width: 0;
+  cursor: pointer;
+  pointer-events: auto !important;
 }
 .cart-btn:hover {
   box-shadow: 0 4px 18px rgba(222,142,190,0.18);

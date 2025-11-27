@@ -94,10 +94,10 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
         </ul>
       </nav>
       <div class="header-actions">
-        <button id="cartToggle" class="cart-btn">
+        <a id="cartToggle" href="cart.php" class="cart-btn" title="Xem giỏ hàng">
           <span class="cart-icon">🛒</span>
           <span class="cart-label"><strong>Giỏ hàng</strong><br><span class="cart-count">0</span> sản phẩm - 0đ</span>
-        </button>
+        </a>
         <button id="mobileToggle" class="mobile-toggle" aria-label="menu">☰</button>
       </div>
     </div>
@@ -132,9 +132,17 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
 
       <div class="cart-summary" style="background: #fff; padding: 20px; border-radius: 8px; text-align: right;">
         <h3>Tổng tiền: <span class="cart-page-total">0₫</span></h3>
-        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
           <a href="index.php" class="btn" style="background: #ccc; color: #000;">Tiếp tục mua sắm</a>
           <a href="thanhtoan.php" class="btn btn-primary">Thanh toán</a>
+        </div>
+      </div>
+
+      <div style="background: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; border-top: 2px solid #f0f0f0;">
+        <p style="margin-bottom: 15px; color: #666;">Muốn xem các đơn hàng trước đây?</p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+          <a href="order-tracking.php" class="btn" style="background: #666; color: #fff; text-decoration: none;">📦 Theo dõi đơn hàng</a>
+          <a href="order-history.php" class="btn" style="background: #666; color: #fff; text-decoration: none;">📋 Lịch sử mua hàng</a>
         </div>
       </div>
     </div>

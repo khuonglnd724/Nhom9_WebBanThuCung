@@ -49,6 +49,35 @@ document.addEventListener('DOMContentLoaded', function() {
                   document.body.style.overflow = 'auto';
                 }
               });
+
+              // ===== THÊM EVENT LISTENER CHO NÚT BÊN TRONG MODAL =====
+              // Nút "Thêm vào giỏ"
+              const addToCartBtn = modal.querySelector('.add-to-cart');
+              if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const aid = this.getAttribute('data-id');
+                  if (aid && typeof addToCart === 'function') {
+                    addToCart(aid);
+                    // Đóng modal sau khi thêm vào giỏ
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                  }
+                });
+              }
+
+              // Nút "Mua ngay"
+              const buyNowBtns = modal.querySelectorAll('.modal-actions button:not(.add-to-cart)');
+              if (buyNowBtns.length > 0) {
+                buyNowBtns[0].addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const accessoryId = addToCartBtn ? addToCartBtn.getAttribute('data-id') : null;
+                  const maxStock = addToCartBtn ? addToCartBtn.getAttribute('data-stock') : 1;
+                  if (accessoryId && typeof addToCartAndRedirect === 'function') {
+                    addToCartAndRedirect(accessoryId, maxStock);
+                  }
+                });
+              }
             }
           })
           .catch(error => {

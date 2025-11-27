@@ -18,10 +18,11 @@ if ($orderId <= 0) {
 // Lấy thông tin đơn hàng
 $conn->set_charset('utf8mb4');
 $sqlOrder = "SELECT o.id, o.order_code, o.user_id, 
-                    o.customer_name, o.customer_email, o.customer_phone,
+                    o.recipient_name, u.email, o.phone,
                     o.total_amount, o.status, o.payment_method, 
                     o.shipping_address, o.notes, o.created_at
              FROM orders o
+             LEFT JOIN users u ON o.user_id = u.id
              WHERE o.id = ?";
 
 $stmt = $conn->prepare($sqlOrder);
@@ -87,10 +88,10 @@ foreach ($items as $it) {
 // Định dạng trạng thái đơn hàng
 $statusMap = [
     'PENDING' => ['label' => 'Chờ xác nhận', 'color' => '#FF9800'],
-    'CONFIRMED' => ['label' => 'Đã xác nhận', 'color' => '#2196F3'],
+    'PAID' => ['label' => 'Đã thanh toán', 'color' => '#2196F3'],
     'SHIPPED' => ['label' => 'Đang giao', 'color' => '#9C27B0'],
-    'DELIVERED' => ['label' => 'Đã giao', 'color' => '#4CAF50'],
-    'CANCELLED' => ['label' => 'Đã hủy', 'color' => '#F44336']
+    'COMPLETED' => ['label' => 'Đã giao', 'color' => '#4CAF50'],
+    'CANCELED' => ['label' => 'Đã hủy', 'color' => '#F44336']
 ];
 
 $currentStatus = $statusMap[$order['status']] ?? ['label' => $order['status'], 'color' => '#999'];
@@ -304,15 +305,15 @@ $paymentMethod = $paymentMap[$order['payment_method']] ?? $order['payment_method
       <div>
         <div class="info-group">
           <label>Họ tên khách hàng</label>
-          <p><?php echo htmlspecialchars($order['customer_name'] ?? 'Không có'); ?></p>
+          <p><?php echo htmlspecialchars($order['recipient_name'] ?? 'Không có'); ?></p>
         </div>
         <div class="info-group">
           <label>Email</label>
-          <p><?php echo htmlspecialchars($order['customer_email'] ?? 'Không có'); ?></p>
+          <p><?php echo htmlspecialchars($order['email'] ?? 'Không có'); ?></p>
         </div>
         <div class="info-group">
           <label>Số điện thoại</label>
-          <p><?php echo htmlspecialchars($order['customer_phone'] ?? 'Không có'); ?></p>
+          <p><?php echo htmlspecialchars($order['phone'] ?? 'Không có'); ?></p>
         </div>
       </div>
       <div>

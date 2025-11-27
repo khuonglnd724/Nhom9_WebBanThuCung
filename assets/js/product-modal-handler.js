@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('view-product-btn')) {
       e.preventDefault();
+      console.log('View product button clicked');
       
       const productId = e.target.getAttribute('data-id');
       
@@ -49,6 +50,39 @@ document.addEventListener('DOMContentLoaded', function() {
                   document.body.style.overflow = 'auto';
                 }
               });
+
+              // ===== THÊM EVENT LISTENER CHO NÚT BÊN TRONG MODAL =====
+              // Nút "Thêm vào giỏ"
+              const addToCartBtn = modal.querySelector('.add-to-cart');
+              console.log('Add to cart button found:', addToCartBtn);
+              if (addToCartBtn) {
+                console.log('Attaching click event to add-to-cart button');
+                addToCartBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const pid = this.getAttribute('data-id');
+                  console.log('Button clicked, productId:', pid);
+                  console.log('addToCart function exists:', typeof addToCart === 'function');
+                  if (pid && typeof addToCart === 'function') {
+                    addToCart(pid);
+                    // Đóng modal sau khi thêm vào giỏ
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                  }
+                });
+              }
+
+              // Nút "Mua ngay"
+              const buyNowBtns = modal.querySelectorAll('.modal-actions button:not(.add-to-cart)');
+              if (buyNowBtns.length > 0) {
+                buyNowBtns[0].addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const productId = addToCartBtn ? addToCartBtn.getAttribute('data-id') : null;
+                  const maxStock = addToCartBtn ? addToCartBtn.getAttribute('data-stock') : 1;
+                  if (productId && typeof addToCartAndRedirect === 'function') {
+                    addToCartAndRedirect(productId, maxStock);
+                  }
+                });
+              }
             }
           })
           .catch(error => {

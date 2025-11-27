@@ -43,10 +43,10 @@
         </ul>
       </nav>
       <div class="header-actions">
-        <button id="cartToggle" class="cart-btn">
+        <a id="cartToggle" href="cart.php" class="cart-btn" title="Xem giỏ hàng">
           <span class="cart-icon">🛒</span>
           <span class="cart-label"><strong>Giỏ hàng</strong><br><span class="cart-count">0</span> sản phẩm - 0đ</span>
-        </button>
+        </a>
         <button id="mobileToggle" class="mobile-toggle" aria-label="menu">☰</button>
       </div>
     </div>

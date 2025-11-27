@@ -111,14 +111,8 @@ if (isset($_GET['product_id'])) {
                             </ul>
                         </div>
                         <div class="modal-actions">
-                            <form method="POST" action="cart.php" style="display:inline;">
-                                <input type="hidden" name="product_id" value="pet-<?php echo (int)$pet['id']; ?>">
-                                <button class="btn btn-primary" type="submit" name="add_to_cart">Thêm vào giỏ</button>
-                            </form>
-                            <form method="POST" action="cart.php" style="display:inline;">
-                                <input type="hidden" name="product_id" value="pet-<?php echo (int)$pet['id']; ?>">
-                                <button class="btn btn-outline" type="submit" name="buy_now">Mua ngay</button>
-                            </form>
+                            <button class="btn btn-primary add-to-cart" data-id="pet-<?php echo (int)$pet['id']; ?>" data-stock="<?php echo (int)$pet['stock']; ?>">Thêm vào giỏ</button>
+                            <button class="btn btn-outline" onclick="addToCartAndRedirect('pet-<?php echo (int)$pet['id']; ?>', '<?php echo (int)$pet['stock']; ?>')">Mua ngay</button>
                         </div>
                     </div>
                 </div>

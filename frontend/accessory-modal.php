@@ -88,14 +88,8 @@ if (isset($_GET['accessory_id'])) {
                             </table>
                         </div>
                         <div class="modal-actions">
-                            <form method="POST" action="cart.php" style="display:inline;">
-                                <input type="hidden" name="product_id" value="acc-<?php echo (int)$accessory['id']; ?>">
-                                <button class="btn btn-primary" type="submit" name="add_to_cart">Thêm vào giỏ</button>
-                            </form>
-                            <form method="POST" action="cart.php" style="display:inline;">
-                                <input type="hidden" name="product_id" value="acc-<?php echo (int)$accessory['id']; ?>">
-                                <button class="btn btn-outline" type="submit" name="buy_now">Mua ngay</button>
-                            </form>
+                            <button class="btn btn-primary add-to-cart" data-id="acc-<?php echo (int)$accessory['id']; ?>" data-stock="<?php echo (int)$accessory['stock']; ?>">Thêm vào giỏ</button>
+                            <button class="btn btn-outline" onclick="addToCartAndRedirect('acc-<?php echo (int)$accessory['id']; ?>', '<?php echo (int)$accessory['stock']; ?>')">Mua ngay</button>
                         </div>
                     </div>
                 </div>
