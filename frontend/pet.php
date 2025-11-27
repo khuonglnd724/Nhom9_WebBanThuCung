@@ -347,8 +347,8 @@ SQL;
       <div class="col">
         <h4>Liên hệ</h4>
         <p>Địa chỉ: 70 Đ. Tô Ký, Tân Chánh Hiệp, Quận 12, Thành phố Hồ Chí Minh</p>
-        <p>Điện thoại: <a href="tel:0939863696">028 3899 2862</a></p>
-        <p>Email: <a href="mailto:matpetfamily2011@gmail.com">matpetfamily2011@gmail.com</a></p>
+        <p>Điện thoại: <a href="tel:02838992862">028 3899 2862</a></p>
+        <p>Email: <a href="mailto:starrypet@gmail.com">starrypet@gmail.com</a></p>
       </div>
       <div class="col">
         <h4>Follow</h4>
@@ -367,7 +367,7 @@ SQL;
         </ul>
       </div>
     </div>
-    <div class="container footer-credits">@2019 - Design by:StaryPets Team</div>
+    <div class="container footer-credits">Design by:StarryPets Team</div>
   </footer>
 
   <script src="../assets/js/script.js"></script>

@@ -121,12 +121,9 @@ document.addEventListener('DOMContentLoaded', function(){
       });
     });
   });
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const productId = btn.getAttribute('data-id');
-      addToCart(productId);
-    });
-  });
+  
+  // Event listener cho .add-to-cart đã được xử lý trong cart.js
+  // Không cần thêm event listener ở đây để tránh duplicate
 
   // Làm nổi bật dropdown cha đang hoạt động
   const currentPage = window.location.pathname.split('/').pop();

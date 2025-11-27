@@ -294,7 +294,7 @@ $paymentMethod = $paymentMap[$order['payment_method']] ?? $order['payment_method
 <body>
   <div class="confirmation-container">
     <div class="confirmation-header">
-      <h1>✓ Đơn hàng được xác nhận!</h1>
+      <h1>Chi tiết đơn hàng</h1>
       <p>Cảm ơn bạn đã đặt hàng tại StarryPets</p>
       <p class="order-code">Mã đơn hàng: <strong><?php echo htmlspecialchars($order['order_code']); ?></strong></p>
       <span class="status-badge"><?php echo $currentStatus['label']; ?></span>

@@ -163,12 +163,6 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
       </div>
     </div>
     <!-- Banner Slider End -->
-          <li><a href="#">Site Map</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="container footer-credits">@2019 - Design by:StaryPets Team</div>
-  </footer>
 
     <script src="../assets/js/cart.js"></script>
   <script src="../assets/js/script.js"></script>

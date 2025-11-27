@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
               if (addToCartBtn) {
                 addToCartBtn.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation(); // Ngăn event bubbling để tránh duplicate
                   const aid = this.getAttribute('data-id');
                   if (aid && typeof addToCart === 'function') {
                     addToCart(aid);
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
               if (buyNowBtn) {
                 buyNowBtn.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation(); // Ngăn event bubbling
                   const accessoryId = this.getAttribute('data-id');
                   const maxStock = this.getAttribute('data-stock');
                   if (accessoryId && typeof addToCartAndRedirect === 'function') {

@@ -208,26 +208,32 @@ $paymentMap = [
     <?php endif; ?>
   </main>
 
-  <footer style="background: #f0e6ee; padding: 30px 0; margin-top: 50px;">
-    <div class="container">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-        <div>
-          <h4>CÔNG TY</h4>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="gioithieu.php">Giới thiệu</a></li>
-            <li><a href="lienhe.php">Liên hệ</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>SẢN PHẨM</h4>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="pet.php">Thú cưng</a></li>
-            <li><a href="category.php">Phụ kiện</a></li>
-          </ul>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="col">
+        <h4>Liên hệ</h4>
+        <p>Địa chỉ: 70 Đ. Tô Ký, Tân Chánh Hiệp, Quận 12, Thành phố Hồ Chí Minh</p>
+        <p>Điện thoại: <a href="tel:02838992862">028 3899 2862</a></p>
+        <p>Email: <a href="mailto:starrypet@gmail.com">starrypet@gmail.com</a></p>
+      </div>
+      <div class="col">
+        <h4>Follow</h4>
+        <div class="socials">
+          <a href="#">Facebook</a>
+          <a href="#">Instagram</a>
+          <a href="#">YouTube</a>
         </div>
       </div>
+      <div class="col">
+        <h4>Thông tin</h4>
+        <ul class="footer-links">
+          <li><a href="#">Chính sách</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Site Map</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="container footer-credits">@2019 - Design by:StaryPets Team</div>
+    <div class="container footer-credits">Design by:StarryPets Team</div>
   </footer>
 
   <script src="../assets/js/cart.js"></script>

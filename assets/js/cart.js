@@ -334,8 +334,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Event listener cho nút "Thêm vào giỏ hàng"
+    // Chỉ xử lý button NGOÀI modal (button trong modal được xử lý bởi modal-handler.js)
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-to-cart')) {
+            // Bỏ qua nếu button nằm trong modal (để tránh duplicate)
+            const modal = e.target.closest('.product-modal');
+            if (modal) {
+                return; // Modal handler sẽ xử lý
+            }
+            
             e.preventDefault();
             const productId = e.target.getAttribute('data-id');
             if (productId) {

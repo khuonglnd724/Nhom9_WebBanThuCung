@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Attaching click event to add-to-cart button');
                 addToCartBtn.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation(); // Ngăn event bubbling để tránh duplicate
                   const pid = this.getAttribute('data-id');
                   console.log('Button clicked, productId:', pid);
                   console.log('addToCart function exists:', typeof addToCart === 'function');
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
               if (buyNowBtn) {
                 buyNowBtn.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation(); // Ngăn event bubbling
                   const productId = this.getAttribute('data-id');
                   const maxStock = this.getAttribute('data-stock');
                   if (productId && typeof addToCartAndRedirect === 'function') {

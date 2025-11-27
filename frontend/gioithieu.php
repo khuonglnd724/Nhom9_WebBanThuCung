@@ -143,14 +143,13 @@ require_once("../connect.php");
   <section class="instagram-row">
     <div class="container insta-inner">
       <div class="insta-list">
-        <!-- placeholders for instagram thumbnails -->
-        <img src="https://placehold.co/120x120?text=pet1" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet2" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet3" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet4" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet5" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet6" alt="pet">
-        <img src="https://placehold.co/120x120?text=pet7" alt="pet">
+        <img src="../assets/images/insta-list/1.png" alt="pet">
+        <img src="../assets/images/insta-list/2.png" alt="pet">
+        <img src="../assets/images/insta-list/3.png" alt="pet">
+        <img src="../assets/images/insta-list/4.png" alt="pet">
+        <img src="../assets/images/insta-list/5.png" alt="pet">
+        <img src="../assets/images/insta-list/6.png" alt="pet">
+        <img src="../assets/images/insta-list/7.png" alt="pet">
       </div>
     </div>
   </section>
@@ -159,8 +158,8 @@ require_once("../connect.php");
       <div class="col">
         <h4>Liên hệ</h4>
         <p>Địa chỉ: 70 Đ. Tô Ký, Tân Chánh Hiệp, Quận 12, Thành phố Hồ Chí Minh</p>
-        <p>Điện thoại: <a href="tel:0939863696">028 3899 2862</a></p>
-        <p>Email: <a href="mailto:matpetfamily2011@gmail.com">matpetfamily2011@gmail.com</a></p>
+        <p>Điện thoại: <a href="tel:02838992862">028 3899 2862</a></p>
+        <p>Email: <a href="mailto:starrypet@gmail.com">starrypet@gmail.com</a></p>
       </div>
       <div class="col">
         <h4>Follow</h4>
@@ -179,7 +178,7 @@ require_once("../connect.php");
         </ul>
       </div>
     </div>
-    <div class="container footer-credits">@2019 - Design by:StaryPets Team</div>
+    <div class="container footer-credits">Design by:StarryPets Team</div>
   </footer>
 
   <script src="../assets/js/script.js"></script>
