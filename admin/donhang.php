@@ -23,6 +23,7 @@ $sql = "SELECT
         o.user_id,
         u.full_name AS user_name,
         o.order_code,
+        o.recipient_name,
         o.total_amount,
         o.status,
         o.payment_method,
@@ -131,6 +132,7 @@ foreach ($orders as $o) {
             <th>Mã đơn</th>
             <th>Tên đơn (mặt hàng)</th>
             <th>Khách hàng</th>
+            <th>Người nhận</th>
             <th>Điện thoại</th>
             <th>Địa chỉ giao hàng</th>
             <th>Thanh toán</th>
@@ -143,7 +145,7 @@ foreach ($orders as $o) {
     </thead>
     <tbody>
         <?php if (empty($orders)): ?>
-            <tr><td colspan="12">Không có đơn hàng.</td></tr>
+            <tr><td colspan="13">Không có đơn hàng.</td></tr>
         <?php else: ?>
             <?php foreach ($orders as $o): ?>
             <tr>
@@ -151,6 +153,7 @@ foreach ($orders as $o) {
                 <td><?php echo htmlspecialchars($o['order_code']); ?></td>
                 <td><?php echo htmlspecialchars($o['item_name'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($o['user_name'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($o['recipient_name'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($o['phone'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($o['shipping_address'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($o['payment_method'] ?? ''); ?></td>

@@ -23,7 +23,7 @@ $lowStockCount = count($lowStockAccessories);
 
     // Today's orders
     $todayOrders = [];
-    if ($st = $conn->prepare("SELECT o.id, o.order_code, o.total_amount, o.status, o.created_at, u.full_name AS user_name 
+    if ($st = $conn->prepare("SELECT o.id, o.order_code, o.recipient_name, o.total_amount, o.status, o.created_at, u.full_name AS user_name 
                               FROM orders o 
                               LEFT JOIN users u ON u.id = o.user_id 
                               WHERE DATE(o.created_at) = CURDATE() 
@@ -32,6 +32,22 @@ $lowStockCount = count($lowStockAccessories);
         $todayOrders = $st->get_result()->fetch_all(MYSQLI_ASSOC);
         $st->close();
     }
+
+// Order status statistics
+$orderStatusStats = [];
+if ($st = $conn->prepare("SELECT status, COUNT(*) as count FROM orders GROUP BY status ORDER BY count DESC")) {
+    $st->execute();
+    $orderStatusStats = $st->get_result()->fetch_all(MYSQLI_ASSOC);
+    $st->close();
+}
+
+$statusLabels = [
+    'PENDING' => 'Chờ xử lý',
+    'PAID' => 'Đã thanh toán',
+    'SHIPPED' => 'Đang giao',
+    'COMPLETED' => 'Đã hoàn thành',
+    'CANCELED' => 'Đã hủy'
+];
 ?>
 <h2>Chào mừng đến với StarryPets</h2>
 <p>Đây là trang chủ hiển thị danh sách thú cưng và phụ kiện.</p>
@@ -56,8 +72,30 @@ $lowStockCount = count($lowStockAccessories);
 </div>
 
     <div class="dashboard-area">
-        <!-- Bỏ biểu đồ doanh thu theo yêu cầu -->
-        <div class="chart-box small"><p>Tình trạng đơn hàng</p></div>
+        <!-- Tình trạng đơn hàng -->
+        <div class="chart-box small">
+            <h3 style="margin:0 0 16px 0;">Tình trạng đơn hàng</h3>
+            <?php if (empty($orderStatusStats)): ?>
+                <p style="color:#999;">Chưa có đơn hàng</p>
+            <?php else: ?>
+                <table class="pet-table">
+                    <thead>
+                        <tr>
+                            <th>Trạng thái</th>
+                            <th>Số lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($orderStatusStats as $stat): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($statusLabels[$stat['status']] ?? $stat['status']); ?></td>
+                            <td><strong><?php echo number_format($stat['count'], 0, ',', '.'); ?></strong></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
     
     
     </div>
@@ -86,9 +124,6 @@ $lowStockCount = count($lowStockAccessories);
             <?php endif; ?>
         </tbody>
     </table>
-    <div style="margin-top:8px; font-size:12px; color:#666;">
-        Ngưỡng cảnh báo có thể chỉnh bằng tham số URL: ?low_stock_threshold=5
-    </div>
     
 </div>
 
@@ -112,7 +147,7 @@ $lowStockCount = count($lowStockAccessories);
                 <tr>
                     <td><?php echo htmlspecialchars($ord['order_code'] ?: ('#'.$ord['id'])); ?></td>
                     <td><?php echo htmlspecialchars($ord['user_name'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars($ord['user_name'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars($ord['recipient_name'] ?? ''); ?></td>
                     <td><?php echo number_format((float)$ord['total_amount'], 0, ',', '.'); ?> đ</td>
                     <td><?php echo htmlspecialchars($ord['status']); ?></td>
                 </tr>
