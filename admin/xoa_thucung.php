@@ -1,26 +1,22 @@
 <?php
-// Secure delete accessory handler
 require_once __DIR__ . '/../connect.php';
 
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header('Location: index.php?p=phukien');
-    exit;
-}
-$id = (int) $_GET['id'];
+// Lấy ID từ URL
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-if (!isset($conn) || $conn === null) {
-    die('DB connection not available');
+if ($id <= 0) {
+    die('ID không hợp lệ!');
 }
 
-// Kiểm tra accessory có tồn tại không
-$check_sql = "SELECT id FROM accessories WHERE id = ?";
+// Kiểm tra pet có tồn tại không
+$check_sql = "SELECT id FROM pets WHERE id = ?";
 $check_stmt = $conn->prepare($check_sql);
 $check_stmt->bind_param('i', $id);
 $check_stmt->execute();
 $check_result = $check_stmt->get_result();
 
 if ($check_result->num_rows === 0) {
-    die('Phụ kiện không tồn tại!');
+    die('Thú cưng không tồn tại!');
 }
 $check_stmt->close();
 
@@ -29,7 +25,7 @@ $conn->begin_transaction();
 
 try {
     // Lấy thông tin ảnh để xóa file
-    $img_sql = "SELECT image_url FROM images WHERE item_type = 'accessory' AND item_id = ?";
+    $img_sql = "SELECT image_url FROM images WHERE item_type = 'pet' AND item_id = ?";
     $img_stmt = $conn->prepare($img_sql);
     $img_stmt->bind_param('i', $id);
     $img_stmt->execute();
@@ -47,7 +43,7 @@ try {
     $img_stmt->close();
     
     // Xóa các ảnh trong bảng images
-    $delete_img_sql = "DELETE FROM images WHERE item_type = 'accessory' AND item_id = ?";
+    $delete_img_sql = "DELETE FROM images WHERE item_type = 'pet' AND item_id = ?";
     $delete_img_stmt = $conn->prepare($delete_img_sql);
     $delete_img_stmt->bind_param('i', $id);
     
@@ -56,20 +52,20 @@ try {
     }
     $delete_img_stmt->close();
     
-    // Xóa phụ kiện trong bảng accessories
-    $delete_acc_sql = "DELETE FROM accessories WHERE id = ?";
-    $delete_acc_stmt = $conn->prepare($delete_acc_sql);
-    $delete_acc_stmt->bind_param('i', $id);
+    // Xóa thú cưng trong bảng pets
+    $delete_pet_sql = "DELETE FROM pets WHERE id = ?";
+    $delete_pet_stmt = $conn->prepare($delete_pet_sql);
+    $delete_pet_stmt->bind_param('i', $id);
     
-    if (!$delete_acc_stmt->execute()) {
-        throw new Exception('Lỗi khi xóa phụ kiện: ' . $delete_acc_stmt->error);
+    if (!$delete_pet_stmt->execute()) {
+        throw new Exception('Lỗi khi xóa thú cưng: ' . $delete_pet_stmt->error);
     }
-    $delete_acc_stmt->close();
+    $delete_pet_stmt->close();
     
     $conn->commit();
     
     // Chuyển về trang danh sách
-    header('Location: index.php?p=phukien&msg=delete_success');
+    header('Location: index.php?p=thucung&msg=delete_success');
     exit;
     
 } catch (Exception $e) {

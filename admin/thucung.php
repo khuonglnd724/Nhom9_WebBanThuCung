@@ -5,23 +5,74 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     exit;
 }
 
+// Kết nối database
+require_once __DIR__ . '/../connect.php';
+
 // Lấy tham số tìm kiếm từ URL
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 $loai_filter = isset($_GET['loai']) ? $_GET['loai'] : 'all';
 
-// Dữ liệu mẫu (sau này có thể lấy từ CSDL)
-$pets = [
-    ['id'=>1,'img'=>'../assets/images/poodle.jpg','name'=>'Milu','loai'=>'Chó','giong'=>'Poodle','gia'=>'2,500,000 đ'],
-    ['id'=>2,'img'=>'../assets/images/aln.jpg','name'=>'MiuMiu','loai'=>'Mèo','giong'=>'Anh lông ngắn','gia'=>'1,500,000 đ'],
-    // bạn có thể thêm mục mới ở đây hoặc thay bằng truy vấn DB
-];
+// Xây dựng câu query với JOIN để lấy tên giống từ bảng breeds và ảnh từ bảng images
+$sql = "SELECT 
+            p.id, 
+            p.category_id, 
+            p.name, 
+            p.breed_id,
+            b.name AS breed_name,
+            p.gender, 
+            p.age_months, 
+            p.color, 
+            p.size, 
+            p.description, 
+            p.price, 
+            p.stock, 
+            p.status,
+            img.image_url,
+            p.created_at, 
+            p.updated_at
+        FROM pets p
+        LEFT JOIN breeds b ON p.breed_id = b.id
+        LEFT JOIN images img ON img.item_id = p.id AND img.item_type = 'pet' AND img.is_primary = 1
+        WHERE 1=1";
 
-// Lọc theo tên và loại
-$filtered = array_filter($pets, function($p) use ($q, $loai_filter) {
-    if ($loai_filter !== 'all' && $p['loai'] !== $loai_filter) return false;
-    if ($q !== '' && stripos($p['name'], $q) === false) return false;
-    return true;
-});
+$params = [];
+$types = '';
+
+// Tìm kiếm theo tên
+if (!empty($q)) {
+    $sql .= " AND p.name LIKE ?";
+    $params[] = '%' . $q . '%';
+    $types .= 's';
+}
+
+// Lọc theo category_id (1=Chó, 2=Mèo)
+if ($loai_filter !== 'all') {
+    if ($loai_filter === 'Chó') {
+        $sql .= " AND p.category_id = 1";
+    } elseif ($loai_filter === 'Mèo') {
+        $sql .= " AND p.category_id = 2";
+    }
+}
+
+$sql .= " ORDER BY p.created_at DESC";
+
+// Thực thi query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("Lỗi prepare statement: " . $conn->error);
+}
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+if (!$stmt->execute()) {
+    die("Lỗi execute: " . $stmt->error);
+}
+
+$result = $stmt->get_result();
+$filtered = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 ?>
 
 <h2 class="page-title">Danh Sách Thú Cưng</h2>
@@ -80,38 +131,40 @@ $filtered = array_filter($pets, function($p) use ($q, $loai_filter) {
         <?php else: ?>
             <?php foreach ($filtered as $pet): ?>
                 <tr>
-                    <td><?php echo isset($pet['id']) ? htmlspecialchars($pet['id']) : ''; ?></td>
+                    <td><?php echo htmlspecialchars($pet['id']); ?></td>
                     <td>
-                        <?php
-                        $img = '';
-                        if (!empty($pet['URLImage'])) $img = $pet['URLImage'];
-                        elseif (!empty($pet['img'])) $img = $pet['img'];
-                        if ($img):
+                        <?php 
+                        if (!empty($pet['image_url'])): 
+                            // Tạo đường dẫn ảnh từ thư mục admin
+                            $img_path = $pet['image_url'];
+                            // Nếu path bắt đầu với /, loại bỏ nó
+                            if (substr($img_path, 0, 1) === '/') {
+                                $img_path = substr($img_path, 1);
+                            }
+                            // Tạo path tương đối từ admin lên root
+                            $img_src = '../' . $img_path;
                         ?>
-                            <img src="<?php echo htmlspecialchars($img); ?>" class="pet-img" alt="">
+                            <img src="<?php echo htmlspecialchars($img_src); ?>" class="pet-img" alt="" onerror="this.style.display='none'">
+                        <?php else: ?>
+                            <span style="color: #999;">Chưa có ảnh</span>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo isset($pet['category_id']) ? htmlspecialchars($pet['category_id']) : (isset($pet['category_name'])?htmlspecialchars($pet['category_name']):''); ?></td>
-                    <td><?php echo isset($pet['name']) ? htmlspecialchars($pet['name']) : ''; ?></td>
-                    <td><?php echo isset($pet['breed']) ? htmlspecialchars($pet['breed']) : (isset($pet['breed_name'])?htmlspecialchars($pet['breed_name']):(isset($pet['giong'])?htmlspecialchars($pet['giong']):'')); ?></td>
-                    <td><?php echo isset($pet['gender']) ? htmlspecialchars($pet['gender']) : (isset($pet['gioi_tinh'])?htmlspecialchars($pet['gioi_tinh']):''); ?></td>
-                    <td><?php echo isset($pet['age_months']) ? htmlspecialchars($pet['age_months']) : (isset($pet['age'])?htmlspecialchars($pet['age']):''); ?></td>
-                    <td><?php echo isset($pet['color']) ? htmlspecialchars($pet['color']) : ''; ?></td>
-                    <td><?php echo isset($pet['size']) ? htmlspecialchars($pet['size']) : ''; ?></td>
-                    <td><?php echo isset($pet['description']) ? nl2br(htmlspecialchars(substr($pet['description'],0,120))) : ''; ?></td>
+                    <td><?php echo htmlspecialchars($pet['category_id']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['name']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['breed_name'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars($pet['gender']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['age_months']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['color']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['size']); ?></td>
+                    <td><?php echo nl2br(htmlspecialchars(substr($pet['description'], 0, 120))); ?></td>
+                    <td><?php echo number_format($pet['price'], 0, ',', '.'); ?> đ</td>
+                    <td><?php echo htmlspecialchars($pet['stock']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['status']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['created_at']); ?></td>
+                    <td><?php echo htmlspecialchars($pet['updated_at']); ?></td>
                     <td>
-                        <?php
-                        if (isset($pet['price']) && is_numeric($pet['price'])) echo number_format($pet['price'],0,',','.');
-                        else echo isset($pet['gia'])?htmlspecialchars($pet['gia']):'';
-                        ?>
-                    </td>
-                    <td><?php echo isset($pet['stock']) ? htmlspecialchars($pet['stock']) : ''; ?></td>
-                    <td><?php echo isset($pet['status']) ? htmlspecialchars($pet['status']) : ''; ?></td>
-                    <td><?php echo isset($pet['created_at']) ? htmlspecialchars($pet['created_at']) : ''; ?></td>
-                    <td><?php echo isset($pet['updated_at']) ? htmlspecialchars($pet['updated_at']) : ''; ?></td>
-                    <td>
-                        <a href="index.php?p=sua_thucung&id=<?php echo urlencode(isset($pet['id'])?$pet['id']:''); ?>" class="btn-edit">Sửa</a>
-                        <a href="#" class="btn-delete">Xóa</a>
+                        <a href="index.php?p=sua_thucung&id=<?php echo urlencode($pet['id']); ?>" class="btn-edit">Sửa</a>
+                        <a href="xoa_thucung.php?id=<?php echo urlencode($pet['id']); ?>" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa thú cưng này?')">Xóa</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

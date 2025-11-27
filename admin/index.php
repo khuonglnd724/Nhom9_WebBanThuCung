@@ -32,7 +32,7 @@ $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
                 $page = isset($_GET['p']) ? $_GET['p'] : 'main';
                 
                 // Danh sách các file hợp lệ
-                $valid_pages = ['main', 'thucung', 'phukien', 'donhang','thongke','user', 'them_thucung','sua_thucung','them_phukien','sua_phukien'];
+                $valid_pages = ['main', 'thucung', 'phukien', 'donhang','thongke','user', 'them_thucung','sua_thucung','them_phukien','sua_phukien','order_history','chi_tiet_don_hang'];
 
                 if (in_array($page, $valid_pages)) {
                     include($page . '.php');
@@ -42,7 +42,7 @@ $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
             ?>
         </div>
 
-        <div id="footer">© 2025 PetSky - All Rights Reserved</div>
+        <div id="footer">© 2025 StarryPets - All Rights Reserved</div>
     </div>
 </div>
 

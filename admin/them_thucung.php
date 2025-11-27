@@ -4,11 +4,24 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     header('Location: index.php?p=them_thucung');
     exit;
 }
+
+// Kết nối database để lấy danh sách giống
+require_once __DIR__ . '/../connect.php';
+
+// Lấy danh sách giống
+$breeds_query = "SELECT id, name, pet_type, description FROM breeds ORDER BY name ASC";
+$breeds_result = $conn->query($breeds_query);
+$breeds = [];
+if ($breeds_result) {
+    while ($row = $breeds_result->fetch_assoc()) {
+        $breeds[] = $row;
+    }
+}
 ?>
 
 <h2 class="page-title">Thêm Thú Cưng Mới</h2>
 
-<form action="index.php?p=luu_thucung" method="POST" enctype="multipart/form-data" class="pet-form">
+<form action="xuly_them_thucung.php" method="POST" enctype="multipart/form-data" class="pet-form">
 
     <div>
         <label for="ten">Tên thú cưng:</label>
@@ -16,16 +29,24 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     </div>
 
     <div>
-        <label for="loai">Loại:</label>
-        <select id="loai" name="loai" required>
-            <option value="Chó">Chó</option>
-            <option value="Mèo">Mèo</option>
+        <label for="category_id">Loại:</label>
+        <select id="category_id" name="category_id" required onchange="filterBreeds(this.value)">
+            <option value="">-- Chọn loại --</option>
+            <option value="1">Chó</option>
+            <option value="2">Mèo</option>
         </select>
     </div>
 
     <div>
-        <label for="giong">Giống:</label>
-        <input type="text" id="giong" name="giong" required>
+        <label for="breed_id">Giống:</label>
+        <select id="breed_id" name="breed_id">
+            <option value="">-- Chọn giống (không bắt buộc) --</option>
+            <?php foreach ($breeds as $breed): ?>
+                <option value="<?php echo $breed['id']; ?>" data-pet-type="<?php echo strtolower($breed['pet_type']); ?>" title="<?php echo htmlspecialchars($breed['description'] ?? ''); ?>">
+                    <?php echo htmlspecialchars($breed['name']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
     </div>
 
     <div>
@@ -88,3 +109,41 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <button type="submit" class="btn-save">Lưu Thú Cưng</button>
 
 </form>
+
+<script>
+function filterBreeds(categoryId) {
+    const breedSelect = document.getElementById('breed_id');
+    const options = breedSelect.querySelectorAll('option');
+    
+    // Map category_id to pet_type
+    const petTypeMap = {
+        '1': 'dog',
+        '2': 'cat'
+    };
+    const petType = petTypeMap[categoryId];
+    
+    options.forEach(option => {
+        if (option.value === '') {
+            option.style.display = 'block';
+            return;
+        }
+        
+        const optionPetType = option.getAttribute('data-pet-type');
+        if (!categoryId || !petType || optionPetType === petType) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    breedSelect.value = '';
+}
+
+// Initialize filter on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category_id');
+    if (categorySelect.value) {
+        filterBreeds(categorySelect.value);
+    }
+});
+</script>
