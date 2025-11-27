@@ -94,9 +94,8 @@ require_once("../connect.php");
               ?>
             </ul>
           </li>
-          <!--
-          <li><a href="#">Giới thiệu</a></li>
-          <li><a href="#">Liên hệ</a></li>-->
+          <li><a href="gioithieu.php">Giới thiệu</a></li>
+          <li><a href="lienhe.php">Liên hệ</a></li>
         </ul>
       </nav>
       <div class="header-actions">
