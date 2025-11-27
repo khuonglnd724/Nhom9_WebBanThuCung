@@ -192,6 +192,9 @@ SQL;
     </div>
     <!-- Banner Slider End -->
 
+    <!-- Modal Container -->
+    <div id="modalContainer"></div>
+
     <!-- Optional search (hidden in UI) -->
     <!-- <div class="container header-search-bar" style="margin-top: 0;">
       <div class="search-wrap">
@@ -347,6 +350,7 @@ SQL;
   <script src="../assets/js/script.js"></script>
   <script src="../assets/js/cart.js"></script>
   <script src="../assets/js/accessory-modal.js"></script>
+  <script src="../assets/js/accessory-modal-handler.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var slides = document.querySelectorAll('.banner-slider .slide');
