@@ -130,6 +130,9 @@ require_once("../connect.php");
 
 
 
+  <!-- Modal Container -->
+  <div id="modalContainer"></div>
+
     <!-- Banner Slider Start -->
     <div class="banner-slider">
       <div class="slides">
@@ -371,9 +374,9 @@ require_once("../connect.php");
 
   <script src="../assets/js/script.js"></script>
   <script src="../assets/js/cart.js"></script>
-  <script src="../assets/js/product-modal.js"></script>
   <script src="../assets/js/accessory-modal.js"></script>
-    <script>
+  <script src="../assets/js/product-modal-handler.js"></script>
+  <script>
       // Fallback slider script (ensures slider always works)
       document.addEventListener('DOMContentLoaded', function() {
         var slides = document.querySelectorAll('.banner-slider .slide');

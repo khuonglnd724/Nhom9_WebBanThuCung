@@ -188,6 +188,9 @@ SQL;
       </div>
     </div>
 
+    <!-- Modal Container -->
+    <div id="modalContainer"></div>
+
     <div class="banner-slider">
       <div class="slides">
         <div class="slide active"><img src="../assets/images/banner 1.jpg" alt="Banner 1"></div>
@@ -370,7 +373,7 @@ SQL;
 
   <script src="../assets/js/script.js"></script>
   <script src="../assets/js/cart.js"></script>
-  <script src="../assets/js/product-modal.js"></script>
+  <script src="../assets/js/product-modal-handler.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var slides = document.querySelectorAll('.banner-slider .slide');
