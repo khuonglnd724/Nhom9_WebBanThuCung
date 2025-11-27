@@ -88,7 +88,7 @@ foreach ($items as $it) {
 // Định dạng trạng thái đơn hàng
 $statusMap = [
     'PENDING' => ['label' => 'Chờ xác nhận', 'color' => '#FF9800'],
-    'PAID' => ['label' => 'Đã thanh toán', 'color' => '#2196F3'],
+    'CONFIRMED' => ['label' => 'Đã xác nhận', 'color' => '#2196F3'],
     'SHIPPED' => ['label' => 'Đang giao', 'color' => '#9C27B0'],
     'COMPLETED' => ['label' => 'Đã giao', 'color' => '#4CAF50'],
     'CANCELED' => ['label' => 'Đã hủy', 'color' => '#F44336']
@@ -141,7 +141,6 @@ $paymentMethod = $paymentMap[$order['payment_method']] ?? $order['payment_method
       border-radius: 20px;
       color: #fff;
       font-weight: bold;
-      background: v-bind('currentStatus.color');
     }
     .order-code {
       font-size: 18px;
@@ -297,7 +296,9 @@ $paymentMethod = $paymentMap[$order['payment_method']] ?? $order['payment_method
       <h1>Chi tiết đơn hàng</h1>
       <p>Cảm ơn bạn đã đặt hàng tại StarryPets</p>
       <p class="order-code">Mã đơn hàng: <strong><?php echo htmlspecialchars($order['order_code']); ?></strong></p>
-      <span class="status-badge"><?php echo $currentStatus['label']; ?></span>
+      <span class="status-badge" style="background: <?php echo $currentStatus['color']; ?>;">
+        <?php echo $currentStatus['label']; ?>
+      </span>
     </div>
 
     <!-- Thông tin đơn hàng -->

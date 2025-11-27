@@ -51,7 +51,7 @@
 ### 5. **Order Tracking** 
 - [ ] Backend API: GET `/api/orders` (danh sách order của user)
 - [ ] Backend API: GET `/api/orders/{order_id}` (chi tiết 1 order)
-- [ ] Update order status (PENDING → PAID → SHIPPED → COMPLETED)
+- [ ] Update order status (PENDING → CONFIRMED → SHIPPED → COMPLETED)
 - [ ] Gửi email notification cho customer khi order status thay đổi
 
 ### 6. **Admin Panel** 

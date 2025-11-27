@@ -93,7 +93,7 @@ function admin_image_path($url) {
 
 $statusLabel = [
     'PENDING' => 'Chờ xử lý',
-    'PAID' => 'Đã thanh toán',
+    'CONFIRMED' => 'Đã xác nhận',
     'SHIPPED' => 'Đang giao',
     'COMPLETED' => 'Đã hoàn thành',
     'CANCELED' => 'Đã hủy'
@@ -107,13 +107,13 @@ $statusLabel = [
     <i class="fas fa-arrow-left"></i> Quay lại
   </a>
   <?php if ($order['status'] === 'PENDING'): ?>
-    <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=PAID" class="btn-edit" style="background-color:#17a2b8;" onclick="return confirm('Chuyển sang Đã thanh toán?');">
-      <i class="fas fa-dollar-sign"></i> Đã thanh toán
+    <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=CONFIRMED" class="btn-edit" style="background-color:#17a2b8;" onclick="return confirm('Chuyển sang Đã xác nhận?');">
+      <i class="fas fa-check"></i> Đã xác nhận
     </a>
     <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=CANCELED" class="btn-delete" onclick="return confirm('Hủy đơn hàng?');">
       <i class="fas fa-times"></i> Hủy
     </a>
-  <?php elseif ($order['status'] === 'PAID'): ?>
+  <?php elseif ($order['status'] === 'CONFIRMED'): ?>
     <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=SHIPPED" class="btn-edit" style="background-color:#ffc107;" onclick="return confirm('Chuyển sang Đang giao?');">
       <i class="fas fa-truck"></i> Giao hàng
     </a>

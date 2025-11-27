@@ -43,7 +43,7 @@ if ($st = $conn->prepare("SELECT status, COUNT(*) as count FROM orders GROUP BY 
 
 $statusLabels = [
     'PENDING' => 'Chờ xử lý',
-    'PAID' => 'Đã thanh toán',
+    'CONFIRMED' => 'Đã xác nhận',
     'SHIPPED' => 'Đang giao',
     'COMPLETED' => 'Đã hoàn thành',
     'CANCELED' => 'Đã hủy'

@@ -32,7 +32,7 @@ $stmt->close();
 // Map status
 $statusMap = [
     'PENDING' => 'Chờ xác nhận',
-    'PAID' => 'Đã thanh toán',
+    'CONFIRMED' => 'Đã xác nhận',
     'SHIPPED' => 'Đang giao',
     'COMPLETED' => 'Đã giao',
     'CANCELED' => 'Đã hủy'
@@ -151,6 +151,24 @@ $paymentMap = [
   <main class="container">
     <h1>📋 Lịch sử mua hàng</h1>
 
+    <?php if (isset($_SESSION['success_message'])): ?>
+      <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+        <?php 
+          echo htmlspecialchars($_SESSION['success_message']); 
+          unset($_SESSION['success_message']);
+        ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error_message'])): ?>
+      <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+        <?php 
+          echo htmlspecialchars($_SESSION['error_message']); 
+          unset($_SESSION['error_message']);
+        ?>
+      </div>
+    <?php endif; ?>
+
     <div style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
       <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
         <a href="cart.php" class="btn" style="background: #ccc; color: #000;">← Quay lại giỏ hàng</a>
@@ -173,7 +191,7 @@ $paymentMap = [
               <th style="padding: 15px; text-align: left;">Tổng tiền</th>
               <th style="padding: 15px; text-align: left;">Phương thức</th>
               <th style="padding: 15px; text-align: left;">Trạng thái</th>
-              <th style="padding: 15px; text-align: center;">Chi tiết</th>
+              <th style="padding: 15px; text-align: center;">Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -184,7 +202,7 @@ $paymentMap = [
               
               if ($status === 'COMPLETED') $statusColor = 'green';
               elseif ($status === 'SHIPPED') $statusColor = '#ff9800';
-              elseif ($status === 'PAID') $statusColor = '#2196f3';
+              elseif ($status === 'CONFIRMED') $statusColor = '#2196f3';
               elseif ($status === 'CANCELED') $statusColor = 'red';
             ?>
             <tr style="border-bottom: 1px solid #eee;">
@@ -198,7 +216,10 @@ $paymentMap = [
                 </span>
               </td>
               <td style="padding: 15px; text-align: center;">
-                <a href="order-confirmation.php?order_id=<?php echo (int)$order['id']; ?>" class="btn" style="background: #2196f3; color: white; padding: 5px 15px; text-decoration: none; font-size: 12px;">Xem</a>
+                <a href="order-confirmation.php?order_id=<?php echo (int)$order['id']; ?>" class="btn" style="background: #2196f3; color: white; padding: 5px 15px; text-decoration: none; font-size: 12px; margin-right: 5px;">Xem</a>
+                <?php if ($status === 'PENDING'): ?>
+                  <a href="cancel-order.php?order_id=<?php echo (int)$order['id']; ?>" class="btn" style="background: #f44336; color: white; padding: 5px 15px; text-decoration: none; font-size: 12px;" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">Hủy</a>
+                <?php endif; ?>
               </td>
             </tr>
             <?php endforeach; ?>

@@ -66,7 +66,7 @@ $stmt->close();
 
 $status_labels = [
     'PENDING' => 'Chờ xử lý',
-    'PAID' => 'Đã thanh toán',
+    'CONFIRMED' => 'Đã xác nhận',
     'SHIPPED' => 'Đang giao',
     'COMPLETED' => 'Đã hoàn thành',
     'CANCELED' => 'Đã hủy'
@@ -131,13 +131,13 @@ $payment_labels = [
                     </td>
                     <td>
                         <?php if ($order['status'] === 'PENDING'): ?>
-                            <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=PAID&user_id=<?php echo urlencode($user_id); ?>" class="btn-edit" style="background-color:#17a2b8; font-size:12px; padding:4px 8px;" onclick="return confirm('Chuyển sang Đã thanh toán?');">
-                                <i class="fas fa-dollar-sign"></i> Đã TT
+                            <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=CONFIRMED&user_id=<?php echo urlencode($user_id); ?>" class="btn-edit" style="background-color:#17a2b8; font-size:12px; padding:4px 8px;" onclick="return confirm('Chuyển sang Đã xác nhận?');">
+                                <i class="fas fa-check"></i> Đã xác nhận
                             </a>
                             <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=CANCELED&user_id=<?php echo urlencode($user_id); ?>" class="btn-delete" style="font-size:12px; padding:4px 8px;" onclick="return confirm('Hủy đơn hàng?');">
                                 <i class="fas fa-times"></i> Hủy
                             </a>
-                        <?php elseif ($order['status'] === 'PAID'): ?>
+                        <?php elseif ($order['status'] === 'CONFIRMED'): ?>
                             <a href="capnhat_trangthai_donhang.php?id=<?php echo urlencode($order['id']); ?>&status=SHIPPED&user_id=<?php echo urlencode($user_id); ?>" class="btn-edit" style="background-color:#ffc107; font-size:12px; padding:4px 8px;" onclick="return confirm('Chuyển sang Đang giao?');">
                                 <i class="fas fa-truck"></i> Giao hàng
                             </a>
