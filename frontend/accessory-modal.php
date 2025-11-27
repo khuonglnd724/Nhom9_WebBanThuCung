@@ -89,7 +89,7 @@ if (isset($_GET['accessory_id'])) {
                         </div>
                         <div class="modal-actions">
                             <button class="btn btn-primary add-to-cart" data-id="acc-<?php echo (int)$accessory['id']; ?>" data-stock="<?php echo (int)$accessory['stock']; ?>">Thêm vào giỏ</button>
-                            <button class="btn btn-outline" onclick="addToCartAndRedirect('acc-<?php echo (int)$accessory['id']; ?>', '<?php echo (int)$accessory['stock']; ?>')">Mua ngay</button>
+                            <button class="btn btn-outline buy-now" data-id="acc-<?php echo (int)$accessory['id']; ?>" data-stock="<?php echo (int)$accessory['stock']; ?>">Mua ngay</button>
                         </div>
                     </div>
                 </div>

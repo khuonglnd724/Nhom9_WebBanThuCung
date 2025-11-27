@@ -387,7 +387,7 @@ $paymentMethod = $paymentMap[$order['payment_method']] ?? $order['payment_method
     <!-- Các nút hành động -->
     <div class="actions">
       <a href="index.php" class="btn btn-primary">← Tiếp tục mua sắm</a>
-      <a href="order-tracking.php?order_code=<?php echo urlencode($order['order_code']); ?>" class="btn btn-secondary">Theo dõi đơn hàng</a>
+      
     </div>
   </div>
 </body>

@@ -67,12 +67,12 @@ document.addEventListener('DOMContentLoaded', function() {
               }
 
               // Nút "Mua ngay"
-              const buyNowBtns = modal.querySelectorAll('.modal-actions button:not(.add-to-cart)');
-              if (buyNowBtns.length > 0) {
-                buyNowBtns[0].addEventListener('click', function(e) {
+              const buyNowBtn = modal.querySelector('.buy-now');
+              if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function(e) {
                   e.preventDefault();
-                  const accessoryId = addToCartBtn ? addToCartBtn.getAttribute('data-id') : null;
-                  const maxStock = addToCartBtn ? addToCartBtn.getAttribute('data-stock') : 1;
+                  const accessoryId = this.getAttribute('data-id');
+                  const maxStock = this.getAttribute('data-stock');
                   if (accessoryId && typeof addToCartAndRedirect === 'function') {
                     addToCartAndRedirect(accessoryId, maxStock);
                   }

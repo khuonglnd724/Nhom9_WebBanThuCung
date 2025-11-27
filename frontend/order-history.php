@@ -154,7 +154,7 @@ $paymentMap = [
     <div style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
       <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
         <a href="cart.php" class="btn" style="background: #ccc; color: #000;">← Quay lại giỏ hàng</a>
-        <a href="order-tracking.php" class="btn" style="background: #666; color: #fff;">📦 Theo dõi đơn hàng</a>
+        
       </div>
     </div>
 

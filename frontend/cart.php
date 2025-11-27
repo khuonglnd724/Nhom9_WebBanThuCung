@@ -141,7 +141,7 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
       <div style="background: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; border-top: 2px solid #f0f0f0;">
         <p style="margin-bottom: 15px; color: #666;">Muốn xem các đơn hàng trước đây?</p>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-          <a href="order-tracking.php" class="btn" style="background: #666; color: #fff; text-decoration: none;">📦 Theo dõi đơn hàng</a>
+          
           <a href="order-history.php" class="btn" style="background: #666; color: #fff; text-decoration: none;">📋 Lịch sử mua hàng</a>
         </div>
       </div>
