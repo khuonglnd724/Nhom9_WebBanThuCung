@@ -46,7 +46,20 @@ if ($breeds_result) {
                     <?php echo htmlspecialchars($breed['name']); ?>
                 </option>
             <?php endforeach; ?>
+            <option value="new">+ Thêm giống mới</option>
         </select>
+    </div>
+
+    <div id="new-breed-section" style="display:none; padding:12px; border:1px solid #ddd; border-radius:6px; background:#f8f9fa; margin-bottom:16px;">
+        <h4 style="margin:0 0 12px 0;">Thông tin giống mới</h4>
+        <div style="margin-bottom:12px;">
+            <label for="new_breed_name">Tên giống mới:</label>
+            <input type="text" id="new_breed_name" name="new_breed_name" placeholder="Ví dụ: Golden Retriever">
+        </div>
+        <div>
+            <label for="new_breed_description">Mô tả giống:</label>
+            <textarea id="new_breed_description" name="new_breed_description" rows="3" placeholder="Mô tả ngắn về giống này..."></textarea>
+        </div>
     </div>
 
     <div>
@@ -123,7 +136,7 @@ function filterBreeds(categoryId) {
     const petType = petTypeMap[categoryId];
     
     options.forEach(option => {
-        if (option.value === '') {
+        if (option.value === '' || option.value === 'new') {
             option.style.display = 'block';
             return;
         }
@@ -137,11 +150,27 @@ function filterBreeds(categoryId) {
     });
     
     breedSelect.value = '';
+    toggleNewBreedSection();
+}
+
+function toggleNewBreedSection() {
+    const breedSelect = document.getElementById('breed_id');
+    const newBreedSection = document.getElementById('new-breed-section');
+    
+    if (breedSelect.value === 'new') {
+        newBreedSection.style.display = 'block';
+    } else {
+        newBreedSection.style.display = 'none';
+    }
 }
 
 // Initialize filter on page load
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category_id');
+    const breedSelect = document.getElementById('breed_id');
+    
+    breedSelect.addEventListener('change', toggleNewBreedSection);
+    
     if (categorySelect.value) {
         filterBreeds(categorySelect.value);
     }
