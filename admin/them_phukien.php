@@ -23,6 +23,8 @@ if ($cat_result) {
 
 <form action="luu_phukien.php" method="POST" enctype="multipart/form-data" class="pet-form">
 
+    <input type="hidden" name="type" value="ACCESSORY">
+
     <div>
         <label>Danh mục:</label>
         <select name="category_id" id="category_id" onchange="toggleNewCategory()" required>

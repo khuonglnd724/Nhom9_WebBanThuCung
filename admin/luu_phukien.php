@@ -24,6 +24,7 @@ if ($category_id === 'new' && !empty($new_category_name)) {
 
 // Lấy dữ liệu từ form
 $name = trim($_POST['name'] ?? '');
+$type = trim($_POST['type'] ?? 'ACCESSORY');
 $brand = trim($_POST['brand'] ?? '');
 $material = trim($_POST['material'] ?? '');
 $size = trim($_POST['size'] ?? '');
@@ -71,11 +72,11 @@ $conn->begin_transaction();
 
 try {
     // Insert vào bảng accessories
-    $sql = "INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock, status, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+    $sql = "INSERT INTO accessories (category_id, name, type, brand, material, size, description, price, stock, status, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('isssssdis', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status);
+    $stmt->bind_param('issssssdis', $category_id, $name, $type, $brand, $material, $size, $description, $price, $stock, $status);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi thêm phụ kiện: ' . $stmt->error);

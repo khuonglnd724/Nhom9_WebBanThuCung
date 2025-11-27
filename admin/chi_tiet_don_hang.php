@@ -17,7 +17,7 @@ if ($order_id <= 0) {
 
 // Fetch order header
 $sqlOrder = "SELECT o.id, o.order_code, o.user_id, u.full_name, u.email, u.phone,
-                    o.total_amount, o.status, o.payment_method, o.shipping_address, o.notes, o.created_at
+                    o.recipient_name, o.total_amount, o.status, o.payment_method, o.shipping_address, o.notes, o.created_at
              FROM orders o
              LEFT JOIN users u ON u.id = o.user_id
              WHERE o.id = ?";
@@ -133,9 +133,13 @@ $statusLabel = [
     </div>
     <div>
       <div style="font-size:12px; color:#666;">Khách hàng</div>
-      <div><?php echo htmlspecialchars($order['full_name'] ?? ''); ?></div> 
+      <div><?php echo htmlspecialchars($order['full_name'] ?? ''); ?></div>
       <div style="font-size:12px; color:#666;">Email: <?php echo htmlspecialchars($order['email'] ?? ''); ?></div>
       <div style="font-size:12px; color:#666;">Điện thoại: <?php echo htmlspecialchars($order['phone'] ?? ''); ?></div>
+    </div>
+    <div>
+      <div style="font-size:12px; color:#666;">Người nhận</div>
+      <div><?php echo htmlspecialchars($order['recipient_name'] ?? ''); ?></div>
     </div>
     <div>
       <div style="font-size:12px; color:#666;">Trạng thái</div>
