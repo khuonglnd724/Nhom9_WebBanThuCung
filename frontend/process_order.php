@@ -34,7 +34,7 @@ if (!$data) {
 }
 
 // Validate dữ liệu
-$required = ['fullName', 'email', 'phone', 'address', 'city', 'payment', 'items'];
+$required = ['fullName', 'phone', 'address', 'city', 'payment', 'items'];
 foreach ($required as $field) {
     if (empty($data[$field])) {
         http_response_code(400);
@@ -79,9 +79,12 @@ try {
     
     $total_amount = $subtotal + $shipping_fee;
     
+    // Lấy tên người nhận từ fullName
+    $recipient_name = $data['fullName'];
+    
     // Insert vào bảng orders
-    $stmt = $conn->prepare("INSERT INTO orders (user_id, order_code, total_amount, payment_method, shipping_address, phone, notes) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isdssss", $user_id, $order_code, $total_amount, $payment_method, $shipping_address, $data['phone'], $notes);
+    $stmt = $conn->prepare("INSERT INTO orders (user_id, order_code, recipient_name, total_amount, payment_method, shipping_address, phone, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issdssss", $user_id, $order_code, $recipient_name, $total_amount, $payment_method, $shipping_address, $data['phone'], $notes);
     
     if (!$stmt->execute()) {
         throw new Exception("Lỗi tạo đơn hàng: " . $stmt->error);
@@ -133,6 +136,12 @@ try {
     }
     
     $stmt_detail->close();
+    
+    // Xóa giỏ hàng của user trong database sau khi đặt hàng thành công
+    $stmt_clear_cart = $conn->prepare("DELETE FROM cart WHERE user_id = ?");
+    $stmt_clear_cart->bind_param("i", $user_id);
+    $stmt_clear_cart->execute();
+    $stmt_clear_cart->close();
     
     // Commit transaction
     $conn->commit();

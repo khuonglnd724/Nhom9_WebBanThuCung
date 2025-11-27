@@ -85,6 +85,7 @@ CREATE TABLE orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   order_code VARCHAR(20) NOT NULL UNIQUE,
+  recipient_name VARCHAR(100) NOT NULL,
   total_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   status ENUM('PENDING','PAID','SHIPPED','COMPLETED','CANCELED') NOT NULL DEFAULT 'PENDING',
   payment_method ENUM('COD','BANK','VNPAY','MOMO') NOT NULL DEFAULT 'COD',
@@ -376,8 +377,8 @@ INSERT INTO images (item_type, item_id, image_url, display_order, is_primary, al
 ('ACCESSORY', 20, 'assets/images/accessories/pet-clipper.png', 1, TRUE, 'Tông đơ cắt lông');
 
 -- Sample order (empty details first)
-INSERT INTO orders (user_id, order_code, shipping_address, phone, payment_method, status) VALUES
- (2,'ORD0001','123 Đường A, Quận 1, TP.HCM','0911111111','COD','PENDING');
+INSERT INTO orders (user_id, order_code, recipient_name, shipping_address, phone, payment_method, status) VALUES
+ (2,'ORD0001','Nguyen Van A','123 Đường A, Quận 1, TP.HCM','0911111111','COD','PENDING');
 
 -- Sample order details (mix pet + accessory)
 INSERT INTO order_details (order_id, item_type, item_id, quantity, unit_price, line_total) VALUES

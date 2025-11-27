@@ -91,11 +91,6 @@ if (!$isLoggedIn) {
           </div>
 
           <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email *</label>
-            <input type="email" id="email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-          </div>
-
-          <div style="margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Số điện thoại *</label>
             <input type="tel" id="phone" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
           </div>
@@ -235,14 +230,13 @@ if (!$isLoggedIn) {
         }
 
         const fullName = document.getElementById("fullName").value.trim();
-        const email = document.getElementById("email").value.trim();
         const phone = document.getElementById("phone").value.trim();
         const address = document.getElementById("address").value.trim();
         const city = document.getElementById("city").value.trim();
         const notes = document.getElementById("notes").value.trim();
         const payment = document.querySelector('input[name="payment"]:checked').value;
 
-        if (!fullName || !email || !phone || !address || !city) {
+        if (!fullName || !phone || !address || !city) {
           alert("Vui lòng nhập đầy đủ thông tin bắt buộc!");
           return;
         }
@@ -250,7 +244,6 @@ if (!$isLoggedIn) {
         // Chuẩn bị dữ liệu gửi lên server
         const orderData = {
           fullName: fullName,
-          email: email,
           phone: phone,
           address: address,
           city: city,
@@ -298,7 +291,7 @@ if (!$isLoggedIn) {
               id: result.order_code,
               order_id: result.order_id,
               date: new Date().toLocaleString('vi-VN'),
-              customer: { fullName, email, phone, address, city, notes },
+              customer: { fullName, phone, address, city, notes },
               items: cart,
               total: cart.reduce((sum, item) => sum + item.qty * item.price, 0) + 30000,
               payment: payment,
@@ -306,15 +299,23 @@ if (!$isLoggedIn) {
             });
             localStorage.setItem(ordersKey, JSON.stringify(orders));
 
-            // Xóa giỏ hàng của user
+            // Xóa giỏ hàng hoàn toàn
             localStorage.removeItem(cartKey);
+            
+            // Cập nhật biến cart trong memory (nếu cart.js đã load)
+            if (typeof window.cart !== 'undefined') {
+              window.cart = [];
+            }
+            
+            // Gọi clearCart() nếu có trong cart.js
+            if (typeof window.clearCart === 'function') {
+              window.clearCart();
+            }
 
             alert(`✅ Đặt hàng thành công!\\nMã đơn hàng: ${result.order_code}\\n\\nCảm ơn bạn đã mua sắm tại StarryPets!`);
             
-            // Quay lại trang chủ
-            setTimeout(() => {
-              window.location.href = "index.php";
-            }, 1000);
+            // Reload trang để đảm bảo giỏ hàng được cập nhật hoàn toàn
+            window.location.href = "index.php";
           } else {
             alert("❌ Đặt hàng thất bại: " + result.message);
           }
