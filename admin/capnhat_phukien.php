@@ -4,18 +4,38 @@
 require_once __DIR__ . '/../connect.php';
 
 // Basic checks
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php?p=phukien');
     exit;
 }
-$id = (int) $_GET['id'];
+
+$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+
+if ($id <= 0) {
+    die('ID không hợp lệ');
+}
 
 if (!isset($conn) || $conn === null) {
     die('Database connection not available');
 }
 
+// Xử lý danh mục mới nếu được chọn
+$category_id = isset($_POST['category_id']) ? $_POST['category_id'] : null;
+$new_category_name = isset($_POST['new_category_name']) ? trim($_POST['new_category_name']) : '';
+
+if ($category_id === 'new' && !empty($new_category_name)) {
+    // Thêm danh mục mới vào database
+    $insert_cat_sql = "INSERT INTO categories (name, created_at) VALUES (?, NOW())";
+    $cat_stmt = $conn->prepare($insert_cat_sql);
+    $cat_stmt->bind_param('s', $new_category_name);
+    $cat_stmt->execute();
+    $category_id = $conn->insert_id;
+    $cat_stmt->close();
+} else {
+    $category_id = (int)$category_id;
+}
+
 // Collect and validate POST data
-$category_id = isset($_POST['category_id']) ? (int)$_POST['category_id'] : null;
 $name = isset($_POST['name']) ? trim($_POST['name']) : '';
 $brand = isset($_POST['brand']) ? trim($_POST['brand']) : '';
 $material = isset($_POST['material']) ? trim($_POST['material']) : '';
@@ -23,49 +43,108 @@ $size = isset($_POST['size']) ? trim($_POST['size']) : '';
 $description = isset($_POST['description']) ? trim($_POST['description']) : '';
 $price = isset($_POST['price']) ? (float)$_POST['price'] : 0;
 $stock = isset($_POST['stock']) ? (int)$_POST['stock'] : 0;
+$status = isset($_POST['status']) ? $_POST['status'] : 'AVAILABLE';
 
 // Validate minimal requirements
 if ($name === '' || $price < 0 || $stock < 0) {
-    // invalid input — redirect back or show error (simple redirect)
-    header('Location: index.php?p=phukien');
-    exit;
+    die('Dữ liệu không hợp lệ');
 }
 
-// Handle image upload safely if provided
-$imgSql = '';
-if (!empty($_FILES['image']['name'])) {
-    $allowedExt = ['jpg','jpeg','png','gif','webp'];
-    $maxSize = 2 * 1024 * 1024; // 2MB
-
-    $uploadName = basename($_FILES['image']['name']);
-    $ext = strtolower(pathinfo($uploadName, PATHINFO_EXTENSION));
-
-    if (!in_array($ext, $allowedExt) || $_FILES['image']['size'] > $maxSize) {
-        // invalid file — ignore upload
-        $uploadName = '';
-    } else {
-        $newImg = time() . '_' . preg_replace('/[^A-Za-z0-9_.-]/', '_', $uploadName);
-        $target = __DIR__ . '/../assets/images/' . $newImg;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            // Optionally: remove old image from disk (not implemented)
-            $imgSql = $newImg;
-        }
+// Xử lý upload ảnh mới (nếu có)
+$new_image_url = null;
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $file_ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+    
+    if (!in_array($file_ext, $allowed_ext)) {
+        die('Chỉ chấp nhận file ảnh: jpg, jpeg, png, gif, webp');
+    }
+    
+    if ($_FILES['image']['size'] > 2 * 1024 * 1024) {
+        die('Kích thước file không được vượt quá 2MB');
+    }
+    
+    $upload_dir = __DIR__ . '/../assets/images/phukien/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    $filename = time() . '_' . uniqid() . '.' . $file_ext;
+    $upload_path = $upload_dir . $filename;
+    
+    if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
+        $new_image_url = '/assets/images/phukien/' . $filename;
     }
 }
 
-// Prepare update statement
-if ($imgSql !== '') {
-    $stmt = $conn->prepare("UPDATE accessories SET category_id=?, name=?, brand=?, material=?, size=?, description=?, price=?, stock=?, image=?, updated_at=NOW() WHERE id=?");
-    $stmt->bind_param('issssssidi', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $imgSql, $id);
-} else {
-    $stmt = $conn->prepare("UPDATE accessories SET category_id=?, name=?, brand=?, material=?, size=?, description=?, price=?, stock=?, updated_at=NOW() WHERE id=?");
-    $stmt->bind_param('isssssidii', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $id);
+// Bắt đầu transaction
+$conn->begin_transaction();
+
+try {
+    // Update bảng accessories
+    $sql = "UPDATE accessories 
+            SET category_id = ?, 
+                name = ?, 
+                brand = ?, 
+                material = ?, 
+                size = ?, 
+                description = ?, 
+                price = ?, 
+                stock = ?,
+                status = ?,
+                updated_at = NOW()
+            WHERE id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('issssssdsi', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status, $id);
+    
+    if (!$stmt->execute()) {
+        throw new Exception('Lỗi khi cập nhật phụ kiện: ' . $stmt->error);
+    }
+    $stmt->close();
+    
+    // Cập nhật ảnh nếu có ảnh mới
+    if ($new_image_url) {
+        // Lấy ảnh cũ để xóa
+        $old_img_sql = "SELECT image_url FROM images WHERE item_type = 'accessory' AND item_id = ? AND is_primary = 1";
+        $old_img_stmt = $conn->prepare($old_img_sql);
+        $old_img_stmt->bind_param('i', $id);
+        $old_img_stmt->execute();
+        $old_img_result = $old_img_stmt->get_result();
+        
+        if ($old_img_result->num_rows > 0) {
+            $old_img = $old_img_result->fetch_assoc();
+            $old_img_path = __DIR__ . '/..' . $old_img['image_url'];
+            if (file_exists($old_img_path)) {
+                unlink($old_img_path);
+            }
+            
+            // Update ảnh
+            $update_img_sql = "UPDATE images SET image_url = ? WHERE item_type = 'accessory' AND item_id = ? AND is_primary = 1";
+            $update_img_stmt = $conn->prepare($update_img_sql);
+            $update_img_stmt->bind_param('si', $new_image_url, $id);
+            $update_img_stmt->execute();
+            $update_img_stmt->close();
+        } else {
+            // Insert ảnh mới
+            $insert_img_sql = "INSERT INTO images (item_type, item_id, image_url, display_order, is_primary) VALUES ('accessory', ?, ?, 1, 1)";
+            $insert_img_stmt = $conn->prepare($insert_img_sql);
+            $insert_img_stmt->bind_param('is', $id, $new_image_url);
+            $insert_img_stmt->execute();
+            $insert_img_stmt->close();
+        }
+        
+        $old_img_stmt->close();
+    }
+    
+    $conn->commit();
+    
+    // Chuyển về trang danh sách
+    header('Location: index.php?p=phukien&msg=update_success');
+    exit;
+    
+} catch (Exception $e) {
+    $conn->rollback();
+    die('Lỗi: ' . $e->getMessage());
 }
-
-$ok = $stmt->execute();
-$stmt->close();
-
-// Redirect back to accessories list
-header('Location: index.php?p=phukien');
-exit;
 ?>

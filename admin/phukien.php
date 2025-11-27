@@ -1,3 +1,96 @@
+<?php
+// Nếu người dùng truy cập trực tiếp file này, chuyển hướng về index
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
+    header('Location: index.php?p=phukien');
+    exit;
+}
+
+// Kết nối database
+require_once __DIR__ . '/../connect.php';
+
+// Tạo base path cho ảnh (từ thư mục admin lên root)
+$base_path = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
+
+// Lấy tham số tìm kiếm từ URL
+$q = isset($_GET['q']) ? trim($_GET['q']) : '';
+$category_filter = isset($_GET['category']) ? $_GET['category'] : 'all';
+
+// Xây dựng câu query với JOIN để lấy tên category và ảnh
+$sql = "SELECT 
+            a.id, 
+            a.category_id, 
+            c.name AS category_name,
+            a.name, 
+            a.brand, 
+            a.material, 
+            a.size, 
+            a.description, 
+            a.price, 
+            a.stock, 
+            a.status,
+            img.image_url,
+            img.item_id as has_image
+        FROM accessories a
+        LEFT JOIN categories c ON a.category_id = c.id
+        LEFT JOIN images img ON img.item_id = a.id AND img.item_type = 'accessory' AND img.is_primary = 1
+        WHERE 1=1";
+
+$params = [];
+$types = '';
+
+// Tìm kiếm theo tên hoặc thương hiệu
+if (!empty($q)) {
+    $sql .= " AND (a.name LIKE ? OR a.brand LIKE ?)";
+    $search_param = '%' . $q . '%';
+    $params[] = $search_param;
+    $params[] = $search_param;
+    $types .= 'ss';
+}
+
+// Lọc theo category_id
+if ($category_filter !== 'all') {
+    $sql .= " AND a.category_id = ?";
+    $params[] = intval($category_filter);
+    $types .= 'i';
+}
+
+$sql .= " ORDER BY a.id DESC";
+
+// Thực thi query
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("Lỗi prepare statement: " . $conn->error);
+}
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+if (!$stmt->execute()) {
+    die("Lỗi execute: " . $stmt->error);
+}
+
+$result = $stmt->get_result();
+$accessories = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// Debug: Kiểm tra số lượng ảnh trong bảng images
+$debug_sql = "SELECT COUNT(*) as total FROM images WHERE item_type = 'accessory'";
+$debug_result = $conn->query($debug_sql);
+$debug_row = $debug_result->fetch_assoc();
+// echo "<!-- DEBUG: Total accessory images in DB: " . $debug_row['total'] . " -->";
+
+// Lấy danh sách categories để hiển thị trong dropdown
+$cat_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+$cat_result = $conn->query($cat_sql);
+$categories = [];
+if ($cat_result) {
+    while ($cat = $cat_result->fetch_assoc()) {
+        $categories[] = $cat;
+    }
+}
+?>
+
 <h2 class="page-title">Danh Sách Phụ Kiện</h2>
 
 <div class="top-bar">
@@ -12,10 +105,11 @@
 
             <select name="category" class="filter-select">
                 <option value="all">Tất cả</option>
-                <option value="thuc-an-cho-cho">Thức ăn cho chó</option>
-                <option value="thuc-an-cho-meo">Thức ăn cho mèo</option>
-                <option value="do-choi">Đồ chơi</option>
-                <option value="phu-kien-ve-sinh">Phụ kiện vệ sinh</option>
+                <?php foreach ($categories as $cat): ?>
+                    <option value="<?php echo $cat['id']; ?>" <?php echo ($category_filter == $cat['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($cat['name']); ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -49,44 +143,47 @@
     </thead>
 
     <tbody>
-        <?php
-        // Sample placeholder row — you will import real data from DB
-        $samples = [
-            [
-                'id'=>1,
-                'img'=>'../assets/images/sample-accessory.jpg',
-                'category'=>'Thức ăn cho chó',
-                'name'=>'Hạt khô vị bò',
-                'brand'=>'PetFood',
-                'material'=>'Ngũ cốc',
-                'size'=>'2kg',
-                'description'=>'Dinh dưỡng cao, phù hợp cho chó mọi lứa tuổi',
-                'price'=>220000,
-                'stock'=>30,
-                'status'=>'ACTIVE'
-            ]
-        ];
-
-        foreach ($samples as $row):
-        ?>
-        <tr>
-            <td><?php echo htmlspecialchars($row['id']); ?></td>
-            <td><?php if(!empty($row['img'])): ?><img src="<?php echo htmlspecialchars($row['img']); ?>" class="pet-img" alt=""><?php endif; ?></td>
-            <td><?php echo htmlspecialchars($row['category']); ?></td>
-            <td><?php echo htmlspecialchars($row['name']); ?></td>
-            <td><?php echo htmlspecialchars($row['brand']); ?></td>
-            <td><?php echo htmlspecialchars($row['material']); ?></td>
-            <td><?php echo htmlspecialchars($row['size']); ?></td>
-            <td><?php echo nl2br(htmlspecialchars(substr($row['description'],0,120))); ?></td>
-            <td><?php echo number_format($row['price'],0,',','.'); ?> đ</td>
-            <td><?php echo htmlspecialchars($row['stock']); ?></td>
-            <td><?php echo htmlspecialchars($row['status']); ?></td>
-            <td>
-                <a href="index.php?p=sua_phukien&id=<?php echo urlencode($row['id']); ?>" class="btn-edit">Sửa</a>
-                <a href="#" class="btn-copy">Chép</a>
-                <a href="#" class="btn-delete">Xóa</a>
-            </td>
-        </tr>
-        <?php endforeach; ?>
+        <?php if (empty($accessories)): ?>
+            <tr><td colspan="12">Không tìm thấy phụ kiện.</td></tr>
+        <?php else: ?>
+            <?php foreach ($accessories as $row): 
+                // Debug: In ra image_url để kiểm tra
+                // echo "<!-- Row ID: " . $row['id'] . ", Image URL: '" . ($row['image_url'] ?? 'NULL') . "' -->";
+            ?>
+            <tr>
+                <td><?php echo htmlspecialchars($row['id']); ?></td>
+                <td>
+                    <?php 
+                    if (!empty($row['image_url'])): 
+                        // Tạo đường dẫn ảnh từ thư mục admin
+                        $img_path = $row['image_url'];
+                        // Nếu path bắt đầu với /, loại bỏ nó
+                        if (substr($img_path, 0, 1) === '/') {
+                            $img_path = substr($img_path, 1);
+                        }
+                        // Tạo path tương đối từ admin lên root
+                        $img_src = '../' . $img_path;
+                    ?>
+                        <img src="<?php echo htmlspecialchars($img_src); ?>" class="pet-img" alt="" onerror="console.error('Image not found:', this.src); this.parentElement.innerHTML='<span style=color:red>Lỗi: <?php echo htmlspecialchars($img_src); ?></span>';">
+                    <?php else: ?>
+                        <span style="color: #999;">Chưa có ảnh</span>
+                    <?php endif; ?>
+                </td>
+                <td><?php echo htmlspecialchars($row['category_name'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($row['name']); ?></td>
+                <td><?php echo htmlspecialchars($row['brand']); ?></td>
+                <td><?php echo htmlspecialchars($row['material']); ?></td>
+                <td><?php echo htmlspecialchars($row['size']); ?></td>
+                <td><?php echo nl2br(htmlspecialchars(substr($row['description'], 0, 120))); ?></td>
+                <td><?php echo number_format($row['price'], 0, ',', '.'); ?> đ</td>
+                <td><?php echo htmlspecialchars($row['stock']); ?></td>
+                <td><?php echo htmlspecialchars($row['status']); ?></td>
+                <td>
+                    <a href="index.php?p=sua_phukien&id=<?php echo urlencode($row['id']); ?>" class="btn-edit">Sửa</a>
+                    <a href="xoa_phukien.php?id=<?php echo urlencode($row['id']); ?>" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phụ kiện này?')">Xóa</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </tbody>
 </table>
