@@ -52,13 +52,15 @@ CREATE TABLE pets (
   price DECIMAL(10,2) NOT NULL,
   stock INT NOT NULL DEFAULT 1,
   status ENUM('AVAILABLE','SOLD','HIDDEN') NOT NULL DEFAULT 'AVAILABLE',
+  is_visible BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_pets_category FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_pets_breed FOREIGN KEY(breed_id) REFERENCES breeds(id) ON DELETE SET NULL ON UPDATE CASCADE,
   INDEX idx_pets_category (category_id),
   INDEX idx_pets_breed (breed_id),
-  INDEX idx_pets_status (status)
+  INDEX idx_pets_status (status),
+  INDEX idx_pets_visible (is_visible)
 ) ENGINE=InnoDB;
 
 -- Accessories table (general products)
@@ -73,11 +75,13 @@ CREATE TABLE accessories (
   price DECIMAL(10,2) NOT NULL,
   stock INT NOT NULL DEFAULT 0,
   status ENUM('ACTIVE','INACTIVE','OUT_OF_STOCK') NOT NULL DEFAULT 'ACTIVE',
+  is_visible BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_accessories_category FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   INDEX idx_accessories_category (category_id),
-  INDEX idx_accessories_status (status)
+  INDEX idx_accessories_status (status),
+  INDEX idx_accessories_visible (is_visible)
 ) ENGINE=InnoDB;
 
 -- Orders master table
@@ -372,9 +376,7 @@ INSERT INTO images (item_type, item_id, image_url, display_order, is_primary, al
 ('ACCESSORY', 15, 'assets/images/accessories/engraved-collar.png', 1, TRUE, 'Vòng cổ tên khắc'),
 ('ACCESSORY', 16, 'assets/images/accessories/auto-water-bottle.png', 1, TRUE, 'Bình nước tự động'),
 ('ACCESSORY', 17, 'assets/images/accessories/cat-litter-tray.png', 1, TRUE, 'Khay vệ sinh cho mèo'),
-('ACCESSORY', 18, 'assets/images/accessories/wooden-cat-house.png', 1, TRUE, 'Nhà gỗ cho mèo'),
-('ACCESSORY', 19, 'assets/images/accessories/foldable-dog-cage.png', 1, TRUE, 'Chuồng gấp cho chó'),
-('ACCESSORY', 20, 'assets/images/accessories/pet-clipper.png', 1, TRUE, 'Tông đơ cắt lông');
+('ACCESSORY', 18, 'assets/images/accessories/wooden-cat-house.png', 1, TRUE, 'Nhà gỗ cho mèo');
 
 -- Sample order (empty details first)
 INSERT INTO orders (user_id, order_code, recipient_name, shipping_address, phone, payment_method, status) VALUES

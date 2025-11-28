@@ -45,6 +45,7 @@ $description = isset($_POST['description']) ? trim($_POST['description']) : '';
 $price = isset($_POST['price']) ? (float)$_POST['price'] : 0;
 $stock = isset($_POST['stock']) ? (int)$_POST['stock'] : 0;
 $status = isset($_POST['status']) ? $_POST['status'] : 'AVAILABLE';
+$is_visible = isset($_POST['is_visible']) ? (int)$_POST['is_visible'] : 1;
 
 // Validate minimal requirements
 if ($name === '' || $price < 0 || $stock < 0) {
@@ -93,11 +94,12 @@ try {
                 price = ?, 
                 stock = ?,
                 status = ?,
+                is_visible = ?,
                 updated_at = NOW()
             WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('issssssdsi', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status, $id);
+    $stmt->bind_param('issssssdsii', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status, $is_visible, $id);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi cập nhật phụ kiện: ' . $stmt->error);

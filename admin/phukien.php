@@ -9,6 +9,22 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 // Kết nối database
 require_once __DIR__ . '/../connect.php';
 
+// Xử lý toggle visibility
+if (isset($_GET['toggle_visibility']) && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $stmt = $conn->prepare("UPDATE accessories SET is_visible = NOT is_visible WHERE id = ?");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->close();
+    
+    // Redirect về trang hiện tại với các filter giữ nguyên
+    $redirect = 'index.php?p=phukien';
+    if (isset($_GET['q'])) $redirect .= '&q=' . urlencode($_GET['q']);
+    if (isset($_GET['category'])) $redirect .= '&category=' . urlencode($_GET['category']);
+    header('Location: ' . $redirect);
+    exit;
+}
+
 // Tạo base path cho ảnh (từ thư mục admin lên root)
 $base_path = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
 
@@ -29,6 +45,7 @@ $sql = "SELECT
             a.price, 
             a.stock, 
             a.status,
+            a.is_visible,
             img.image_url,
             img.item_id as has_image
         FROM accessories a
@@ -81,8 +98,8 @@ $debug_result = $conn->query($debug_sql);
 $debug_row = $debug_result->fetch_assoc();
 // echo "<!-- DEBUG: Total accessory images in DB: " . $debug_row['total'] . " -->";
 
-// Lấy danh sách categories để hiển thị trong dropdown
-$cat_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+// Lấy danh sách categories để hiển thị trong dropdown (chỉ lấy ACCESSORY và BOTH)
+$cat_sql = "SELECT id, name FROM categories WHERE type IN ('ACCESSORY', 'BOTH') ORDER BY name ASC";
 $cat_result = $conn->query($cat_sql);
 $categories = [];
 if ($cat_result) {
@@ -139,13 +156,14 @@ if ($cat_result) {
             <th>Giá</th>
             <th>Tồn kho</th>
             <th>Trạng thái</th>
+            <th>Hiển thị</th>
             <th>Hành động</th>
         </tr>
     </thead>
 
     <tbody>
         <?php if (empty($accessories)): ?>
-            <tr><td colspan="12">Không tìm thấy phụ kiện.</td></tr>
+            <tr><td colspan="13">Không tìm thấy phụ kiện.</td></tr>
         <?php else: ?>
             <?php foreach ($accessories as $row): 
                 // Debug: In ra image_url để kiểm tra
@@ -180,6 +198,21 @@ if ($cat_result) {
                 <td><?php echo htmlspecialchars($row['stock']); ?></td>
                 <td><?php echo htmlspecialchars($row['status']); ?></td>
                 <td>
+                    <button onclick="toggleVisibility(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($q); ?>', '<?php echo htmlspecialchars($category_filter); ?>')" 
+                            style="border:none; background:none; cursor:pointer; padding:4px 8px; font-size:14px;"
+                            title="Click để thay đổi">
+                        <?php if ($row['is_visible']): ?>
+                            <span style="color: #28a745; font-weight: 600;">
+                                <i class="fas fa-eye"></i> Hiện
+                            </span>
+                        <?php else: ?>
+                            <span style="color: #dc3545; font-weight: 600;">
+                                <i class="fas fa-eye-slash"></i> Ẩn
+                            </span>
+                        <?php endif; ?>
+                    </button>
+                </td>
+                <td>
                     <a href="index.php?p=sua_phukien&id=<?php echo urlencode($row['id']); ?>" class="btn-edit">Sửa</a>
                     <a href="xoa_phukien.php?id=<?php echo urlencode($row['id']); ?>" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phụ kiện này?')">Xóa</a>
                 </td>
@@ -188,3 +221,14 @@ if ($cat_result) {
         <?php endif; ?>
     </tbody>
 </table>
+
+<script>
+function toggleVisibility(id, q, category) {
+    if (confirm('Bạn có chắc muốn thay đổi trạng thái hiển thị?')) {
+        let url = 'index.php?p=phukien&toggle_visibility=1&id=' + id;
+        if (q) url += '&q=' + encodeURIComponent(q);
+        if (category && category !== 'all') url += '&category=' + encodeURIComponent(category);
+        window.location.href = url;
+    }
+}
+</script>

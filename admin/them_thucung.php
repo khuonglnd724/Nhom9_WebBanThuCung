@@ -66,8 +66,8 @@ if ($breeds_result) {
     <div>
         <label for="gioi_tinh">Giới tính:</label>
         <select id="gioi_tinh" name="gioi_tinh" required>
-            <option value="MALE">Nam</option>
-            <option value="FEMALE">Nữ</option>
+            <option value="MALE">Đực</option>
+            <option value="FEMALE">Cái</option>
             <option value="UNKNOWN">Không rõ</option>
         </select>
     </div>

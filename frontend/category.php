@@ -28,6 +28,7 @@ if ($conn && !$conn->connect_error) {
 
   // Xây WHERE theo filter
   $conditions = [];
+  $conditions[] = "a.is_visible = 1"; // Chỉ hiển thị phụ kiện visible
   if ($categoryId > 0) { $conditions[] = "a.category_id = $categoryId"; }
   if ($priceParam === 'low') {
     $conditions[] = "a.price < 10000000";

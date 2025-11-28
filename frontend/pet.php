@@ -32,6 +32,7 @@ if ($conn && !$conn->connect_error) {
 
   // Xây WHERE theo filter
   $conditions = [];
+  $conditions[] = "p.is_visible = 1"; // Chỉ hiển thị sản phẩm visible
   if ($breedId > 0) { $conditions[] = "p.breed_id = $breedId"; }
   if ($typeUpper !== '') { $conditions[] = "b.pet_type = '" . $conn->real_escape_string($typeUpper) . "'"; }
   if ($priceParam === 'low') {

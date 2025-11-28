@@ -33,8 +33,8 @@ if (!$data) {
     return;
 }
 
-// Lấy danh sách categories cho dropdown
-$cat_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+// Lấy danh sách categories cho dropdown (chỉ lấy ACCESSORY và BOTH)
+$cat_sql = "SELECT id, name FROM categories WHERE type IN ('ACCESSORY', 'BOTH') ORDER BY name ASC";
 $cat_result = $conn->query($cat_sql);
 $categories = [];
 if ($cat_result) {
@@ -112,11 +112,29 @@ if ($cat_result) {
     </div>
 
     <div>
+        <label>Hiển thị trên trang chủ:</label>
+        <select name="is_visible">
+            <option value="1" <?= ($data['is_visible'] == 1) ? 'selected' : '' ?>>Hiện</option>
+            <option value="0" <?= ($data['is_visible'] == 0) ? 'selected' : '' ?>>Ẩn</option>
+        </select>
+    </div>
+
+    <div>
         <label>Ảnh hiện tại:</label><br>
-        <?php if (!empty($data['image_url'])): ?>
-            <img src="<?= htmlspecialchars($data['image_url']) ?>" class="pet-img" alt="">
+        <?php if (!empty($data['image_url'])): 
+            // Tạo đường dẫn ảnh từ thư mục admin
+            $img_path = $data['image_url'];
+            // Nếu path bắt đầu với /, loại bỏ nó
+            if (substr($img_path, 0, 1) === '/') {
+                $img_path = substr($img_path, 1);
+            }
+            // Tạo path tương đối từ admin lên root
+            $img_src = '../' . $img_path;
+        ?>
+            <img src="<?= htmlspecialchars($img_src) ?>" class="pet-img" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p style="color: #999; display: none;">Không tìm thấy ảnh</p>
         <?php else: ?>
-            <p>Chưa có ảnh</p>
+            <p style="color: #999;">Chưa có ảnh</p>
         <?php endif; ?>
     </div>
 

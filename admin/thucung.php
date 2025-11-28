@@ -9,6 +9,22 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 // Kết nối database
 require_once __DIR__ . '/../connect.php';
 
+// Xử lý toggle visibility
+if (isset($_GET['toggle_visibility']) && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $stmt = $conn->prepare("UPDATE pets SET is_visible = NOT is_visible WHERE id = ?");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->close();
+    
+    // Redirect về trang hiện tại với các filter giữ nguyên
+    $redirect = 'index.php?p=thucung';
+    if (isset($_GET['q'])) $redirect .= '&q=' . urlencode($_GET['q']);
+    if (isset($_GET['loai'])) $redirect .= '&loai=' . urlencode($_GET['loai']);
+    header('Location: ' . $redirect);
+    exit;
+}
+
 // Lấy tham số tìm kiếm từ URL
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 $loai_filter = isset($_GET['loai']) ? $_GET['loai'] : 'all';
@@ -28,6 +44,7 @@ $sql = "SELECT
             p.price, 
             p.stock, 
             p.status,
+            p.is_visible,
             img.image_url,
             p.created_at, 
             p.updated_at
@@ -120,6 +137,7 @@ $stmt->close();
             <th>Giá</th>
             <th>Stock</th>
             <th>Trạng thái</th>
+            <th>Hiển thị</th>
             <th>Tạo lúc</th>
             <th>Cập nhật</th>
             <th>Hành động</th>
@@ -128,7 +146,7 @@ $stmt->close();
 
     <tbody>
         <?php if (empty($filtered)): ?>
-            <tr><td colspan="16">Không tìm thấy kết quả.</td></tr>
+            <tr><td colspan="17">Không tìm thấy kết quả.</td></tr>
         <?php else: ?>
             <?php foreach ($filtered as $pet): ?>
                 <tr>
@@ -161,6 +179,21 @@ $stmt->close();
                     <td><?php echo number_format($pet['price'], 0, ',', '.'); ?> đ</td>
                     <td><?php echo htmlspecialchars($pet['stock']); ?></td>
                     <td><?php echo htmlspecialchars($pet['status']); ?></td>
+                    <td>
+                        <button onclick="toggleVisibility(<?php echo $pet['id']; ?>, '<?php echo htmlspecialchars($q); ?>', '<?php echo htmlspecialchars($loai_filter); ?>')" 
+                                style="border:none; background:none; cursor:pointer; padding:4px 8px; font-size:14px;"
+                                title="Click để thay đổi">
+                            <?php if ($pet['is_visible']): ?>
+                                <span style="color: #28a745; font-weight: 600;">
+                                    <i class="fas fa-eye"></i> Hiện
+                                </span>
+                            <?php else: ?>
+                                <span style="color: #dc3545; font-weight: 600;">
+                                    <i class="fas fa-eye-slash"></i> Ẩn
+                                </span>
+                            <?php endif; ?>
+                        </button>
+                    </td>
                     <td><?php echo htmlspecialchars($pet['created_at']); ?></td>
                     <td><?php echo htmlspecialchars($pet['updated_at']); ?></td>
                     <td>
@@ -172,3 +205,14 @@ $stmt->close();
         <?php endif; ?>
     </tbody>
 </table>
+
+<script>
+function toggleVisibility(id, q, loai) {
+    if (confirm('Bạn có chắc muốn thay đổi trạng thái hiển thị?')) {
+        let url = 'index.php?p=thucung&toggle_visibility=1&id=' + id;
+        if (q) url += '&q=' + encodeURIComponent(q);
+        if (loai) url += '&loai=' + encodeURIComponent(loai);
+        window.location.href = url;
+    }
+}
+</script>

@@ -80,18 +80,28 @@ if ($breeds_result) {
     <div>
         <label>Ảnh hiện tại:</label>
         <br>
-        <?php if (!empty($tc['image_url'])): ?>
-            <img src="<?= htmlspecialchars($tc['image_url']) ?>" class="pet-img" alt="">
+        <?php if (!empty($tc['image_url'])): 
+            // Tạo đường dẫn ảnh từ thư mục admin
+            $img_path = $tc['image_url'];
+            // Nếu path bắt đầu với /, loại bỏ nó
+            if (substr($img_path, 0, 1) === '/') {
+                $img_path = substr($img_path, 1);
+            }
+            // Tạo path tương đối từ admin lên root
+            $img_src = '../' . $img_path;
+        ?>
+            <img src="<?= htmlspecialchars($img_src) ?>" class="pet-img" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p style="color: #999; display: none;">Không tìm thấy ảnh</p>
         <?php else: ?>
-            <p>Chưa có ảnh</p>
+            <p style="color: #999;">Chưa có ảnh</p>
         <?php endif; ?>
     </div>
 
     <div>
         <label for="gioi_tinh">Giới tính:</label>
         <select id="gioi_tinh" name="gioi_tinh" required>
-            <option value="MALE"<?= $tc['gender']==='MALE' ? ' selected' : '' ?>>Nam</option>
-            <option value="FEMALE"<?= $tc['gender']==='FEMALE' ? ' selected' : '' ?>>Nữ</option>
+            <option value="MALE"<?= $tc['gender']==='MALE' ? ' selected' : '' ?>>Đực</option>
+            <option value="FEMALE"<?= $tc['gender']==='FEMALE' ? ' selected' : '' ?>>Cái</option>
             <option value="UNKNOWN"<?= $tc['gender']==='UNKNOWN' ? ' selected' : '' ?>>Không rõ</option>
         </select>
     </div>
@@ -131,6 +141,14 @@ if ($breeds_result) {
             <option value="AVAILABLE"<?= $tc['status']==='AVAILABLE' ? ' selected' : '' ?>>AVAILABLE</option>
             <option value="SOLD"<?= $tc['status']==='SOLD' ? ' selected' : '' ?>>SOLD</option>
             <option value="HIDDEN"<?= $tc['status']==='HIDDEN' ? ' selected' : '' ?>>HIDDEN</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="is_visible">Hiển thị trên trang chủ:</label>
+        <select id="is_visible" name="is_visible">
+            <option value="1"<?= $tc['is_visible'] == 1 ? ' selected' : '' ?>>Hiện</option>
+            <option value="0"<?= $tc['is_visible'] == 0 ? ' selected' : '' ?>>Ẩn</option>
         </select>
     </div>
 

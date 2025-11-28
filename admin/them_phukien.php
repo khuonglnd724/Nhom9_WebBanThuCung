@@ -9,8 +9,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 // Kết nối database để lấy danh sách categories
 require_once __DIR__ . '/../connect.php';
 
-// Lấy danh sách categories
-$cat_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+// Lấy danh sách categories (chỉ lấy ACCESSORY và BOTH)
+$cat_sql = "SELECT id, name FROM categories WHERE type IN ('ACCESSORY', 'BOTH') ORDER BY name ASC";
 $cat_result = $conn->query($cat_sql);
 $categories = [];
 if ($cat_result) {

@@ -225,7 +225,7 @@ require_once("../connect.php");
                             LIMIT 1) AS image_url
                     FROM pets p
                     LEFT JOIN breeds b ON p.breed_id = b.id
-                    WHERE p.stock > 0
+                    WHERE p.stock > 0 AND p.is_visible = 1
                     ORDER BY p.created_at DESC, p.id DESC
                     LIMIT 8";
             $res = $conn->query($sql);
@@ -280,7 +280,7 @@ require_once("../connect.php");
                                ORDER BY is_primary DESC, display_order ASC, id ASC
                                LIMIT 1) AS image_url
                        FROM accessories a
-                       WHERE a.stock > 0
+                       WHERE a.stock > 0 AND a.is_visible = 1
                        ORDER BY a.created_at DESC, a.id DESC
                        LIMIT 8";
               $resA = $conn->query($sqlA);

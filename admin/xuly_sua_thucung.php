@@ -19,6 +19,7 @@ $size = $_POST['size'] ?? '';
 $gia = floatval($_POST['gia'] ?? 0);
 $stock = intval($_POST['stock'] ?? 1);
 $status = $_POST['status'] ?? 'AVAILABLE';
+$is_visible = isset($_POST['is_visible']) ? intval($_POST['is_visible']) : 1;
 $mota = trim($_POST['mota'] ?? '');
 
 // Validate
@@ -92,11 +93,12 @@ try {
                 price = ?, 
                 stock = ?, 
                 status = ?,
+                is_visible = ?,
                 updated_at = NOW()
             WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('isisssssdisi', $category_id, $ten, $breed_id, $gioi_tinh, $age_months, $color, $size, $mota, $gia, $stock, $status, $id);
+    $stmt->bind_param('isisssssdisii', $category_id, $ten, $breed_id, $gioi_tinh, $age_months, $color, $size, $mota, $gia, $stock, $status, $is_visible, $id);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi cập nhật thú cưng: ' . $stmt->error);
