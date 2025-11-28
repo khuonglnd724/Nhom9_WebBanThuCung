@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Nếu người dùng truy cập trực tiếp file này, chuyển hướng về index
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     header('Location: index.php?p=them_phukien');

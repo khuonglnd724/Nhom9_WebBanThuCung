@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Mark order as DELIVERED
 require_once __DIR__ . '/../connect.php';
 

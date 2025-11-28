@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Ensure DB connection is available
 require_once __DIR__ . '/../connect.php';
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Redirect if accessed directly
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     header('Location: index.php?p=user');

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Redirect if accessed directly
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     $id = isset($_GET['id']) ? $_GET['id'] : (isset($_GET['order_id']) ? $_GET['order_id'] : '');

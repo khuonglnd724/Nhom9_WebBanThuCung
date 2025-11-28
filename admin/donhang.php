@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Redirect if accessed directly
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         header('Location: index.php?p=donhang');
@@ -82,11 +83,13 @@ $stmt->close();
 <h2 class="page-title">Danh Sách Đơn Hàng</h2>
 
 <?php
-// Management summary: total orders and revenue (sum of total_amount)
+// Management summary: total orders and revenue (only COMPLETED orders)
 $totalOrders = count($orders);
 $totalRevenue = 0;
 foreach ($orders as $o) {
-        $totalRevenue += (float)($o['total_amount'] ?? 0);
+        if (($o['status'] ?? '') === 'COMPLETED') {
+                $totalRevenue += (float)($o['total_amount'] ?? 0);
+        }
 }
 ?>
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Update order status handler
 require_once __DIR__ . '/../connect.php';
 

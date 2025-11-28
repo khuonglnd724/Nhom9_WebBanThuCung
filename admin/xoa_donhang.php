@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Redirect guard: allow only via index routing? Here we permit direct as action
 require_once __DIR__ . '/../connect.php';
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Update accessory handler: use connect.php (project uses connect.php),
 // validate input, use prepared statements and safe image upload.
 require_once __DIR__ . '/../connect.php';

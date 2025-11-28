@@ -152,10 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['forgot'])) {
         </div>
         <nav class="navbar-menu">
             <a href="index.php">Trang chủ</a>
-            <a href="dichvu.php">Dịch vụ</a>
-            <!--
             <a href="gioithieu.php">Giới thiệu</a>
-            <a href="lienhe.php">Liên hệ</a>-->
+            <a href="lienhe.php">Liên hệ</a>
         </nav>
     </header>
 

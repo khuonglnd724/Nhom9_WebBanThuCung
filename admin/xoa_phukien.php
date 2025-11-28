@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Secure delete accessory handler
 require_once __DIR__ . '/../connect.php';
 

@@ -10,16 +10,18 @@ require_once __DIR__ . '/../connect.php';
 // Get current month and year
 $currentMonth = date('Y-m');
 $currentYear = date('Y');
+$selectedMonth = isset($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month']) ? $_GET['month'] : $currentMonth;
+$selectedMonthLabel = date('m/Y', strtotime($selectedMonth . '-01'));
 
-// Total revenue (all time)
-$stmt = $conn->prepare("SELECT SUM(total_amount) as total_revenue FROM orders WHERE status != 'CANCELLED'");
+// Total revenue (all time) - only COMPLETED
+$stmt = $conn->prepare("SELECT SUM(total_amount) as total_revenue FROM orders WHERE status = 'COMPLETED'");
 $stmt->execute();
 $totalRevenue = $stmt->get_result()->fetch_assoc()['total_revenue'] ?? 0;
 $stmt->close();
 
-// Monthly revenue (current month)
-$stmt = $conn->prepare("SELECT SUM(total_amount) as monthly_revenue FROM orders WHERE DATE_FORMAT(created_at, '%Y-%m') = ? AND status != 'CANCELLED'");
-$stmt->bind_param('s', $currentMonth);
+// Monthly revenue (selected month) - only COMPLETED
+$stmt = $conn->prepare("SELECT SUM(total_amount) as monthly_revenue FROM orders WHERE DATE_FORMAT(created_at, '%Y-%m') = ? AND status = 'COMPLETED'");
+$stmt->bind_param('s', $selectedMonth);
 $stmt->execute();
 $monthlyRevenue = $stmt->get_result()->fetch_assoc()['monthly_revenue'] ?? 0;
 $stmt->close();
@@ -30,14 +32,14 @@ $stmt->execute();
 $totalOrders = $stmt->get_result()->fetch_assoc()['total_orders'] ?? 0;
 $stmt->close();
 
-// Monthly orders
+// Monthly orders (selected month, all statuses)
 $stmt = $conn->prepare("SELECT COUNT(*) as monthly_orders FROM orders WHERE DATE_FORMAT(created_at, '%Y-%m') = ?");
-$stmt->bind_param('s', $currentMonth);
+$stmt->bind_param('s', $selectedMonth);
 $stmt->execute();
 $monthlyOrders = $stmt->get_result()->fetch_assoc()['monthly_orders'] ?? 0;
 $stmt->close();
 
-// Orders by status
+// Orders by status (all time)
 $stmt = $conn->prepare("SELECT status, COUNT(*) as count FROM orders GROUP BY status");
 $stmt->execute();
 $ordersByStatus = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -83,13 +85,13 @@ $stmt->execute();
 $topItems = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Revenue by month (last 6 months)
+// Revenue by month (last 6 months) - only COMPLETED
 $stmt = $conn->prepare("SELECT 
     DATE_FORMAT(created_at, '%Y-%m') as month,
     SUM(total_amount) as revenue,
     COUNT(*) as order_count
 FROM orders
-WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND status != 'CANCELLED'
+WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND status = 'COMPLETED'
 GROUP BY DATE_FORMAT(created_at, '%Y-%m')
 ORDER BY month ASC");
 $stmt->execute();
@@ -107,13 +109,26 @@ $statusLabels = [
 
 <h2 class="page-title">Thống Kê</h2>
 
+<!-- Month Filter -->
+<form method="get" action="index.php" style="margin:18px 0 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:flex-start;">
+    <input type="hidden" name="p" value="thongke" />
+    <div style="display:flex; align-items:center; gap:10px; background:#f8f9fa; border-radius:8px; padding:10px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <label for="month" style="font-size:15px; color:#333; font-weight:500; margin-right:4px;">Chọn tháng</label>
+        <input type="month" id="month" name="month" value="<?php echo htmlspecialchars($selectedMonth); ?>" style="padding:6px 12px; border:1px solid #ccc; border-radius:6px; font-size:15px; background:#fff; color:#222; outline:none; transition:border-color 0.2s;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ccc'" />
+    </div>
+    <button type="submit" class="btn-submit" style="display:flex; align-items:center; gap:6px; background:linear-gradient(90deg,#007bff 60%,#17a2b8 100%); color:#fff; border:none; border-radius:7px; padding:6px 16px; font-size:14px; font-weight:500; box-shadow:0 1px 4px rgba(0,0,0,0.07); cursor:pointer; transition:background 0.2s; min-width:70px; height:32px;">
+        <i class="fas fa-filter" aria-hidden="true" style="font-size:15px;"></i>
+        <span>Áp dụng</span>
+    </button>
+</form>
+
 <!-- Summary Cards -->
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin:20px 0;">
     <div style="border:1px solid #ddd; border-radius:8px; padding:16px; background:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
             <i class="fas fa-dollar-sign" style="font-size:28px; color:#28a745;"></i>
             <div>
-                <div style="font-size:12px; color:#666;">Tổng doanh thu</div>
+                <div style="font-size:12px; color:#666;">Tổng doanh thu (COMPLETED)</div>
                 <div style="font-size:20px; font-weight:600;"><?php echo number_format($totalRevenue, 0, ',', '.'); ?> đ</div>
             </div>
         </div>
@@ -123,7 +138,7 @@ $statusLabels = [
         <div style="display:flex; align-items:center; gap:12px;">
             <i class="fas fa-chart-line" style="font-size:28px; color:#17a2b8;"></i>
             <div>
-                <div style="font-size:12px; color:#666;">Doanh thu tháng <?php echo date('m/Y'); ?></div>
+                <div style="font-size:12px; color:#666;">Doanh thu tháng <?php echo htmlspecialchars($selectedMonthLabel); ?> (COMPLETED)</div>
                 <div style="font-size:20px; font-weight:600;"><?php echo number_format($monthlyRevenue, 0, ',', '.'); ?> đ</div>
             </div>
         </div>
@@ -133,17 +148,7 @@ $statusLabels = [
         <div style="display:flex; align-items:center; gap:12px;">
             <i class="fas fa-shopping-cart" style="font-size:28px; color:#ffc107;"></i>
             <div>
-                <div style="font-size:12px; color:#666;">Tổng đơn hàng</div>
-                <div style="font-size:20px; font-weight:600;"><?php echo number_format($totalOrders, 0, ',', '.'); ?></div>
-            </div>
-        </div>
-    </div>
-    
-    <div style="border:1px solid #ddd; border-radius:8px; padding:16px; background:#fff;">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <i class="fas fa-calendar-check" style="font-size:28px; color:#6c757d;"></i>
-            <div>
-                <div style="font-size:12px; color:#666;">Đơn hàng tháng này</div>
+                <div style="font-size:12px; color:#666;">Đơn hàng tháng <?php echo htmlspecialchars($selectedMonthLabel); ?></div>
                 <div style="font-size:20px; font-weight:600;"><?php echo number_format($monthlyOrders, 0, ',', '.'); ?></div>
             </div>
         </div>

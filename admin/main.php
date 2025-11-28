@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth.php';
 // Load DB to compute low-stock accessories
 require_once __DIR__ . '/../connect.php';
 

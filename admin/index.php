@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>PetSky - Trang Chủ</title>
 <?php
+require_once __DIR__ . '/auth.php';
 // Tạo đường dẫn base động dựa trên vị trí script để CSS luôn load đúng khi deploy ở bất kỳ thư mục nào
 $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '\\/');
 ?>
