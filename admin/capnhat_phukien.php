@@ -4,6 +4,26 @@ require_once __DIR__ . '/auth.php';
 // validate input, use prepared statements and safe image upload.
 require_once __DIR__ . '/../connect.php';
 
+// Helper: create URL-friendly slug from a name
+function make_slug($str) {
+    $str = trim($str);
+    // Try transliteration
+    $slug = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+    if ($slug === false || $slug === null) {
+        $slug = $str; // fallback
+    }
+    $slug = strtolower($slug);
+    // Replace non-alphanumeric with hyphens
+    $slug = preg_replace('/[^a-z0-9]+/i', '-', $slug);
+    // Trim hyphens
+    $slug = trim($slug, '-');
+    // Fallback if empty
+    if ($slug === '') {
+        $slug = 'cat-' . time();
+    }
+    return $slug;
+}
+
 // Basic checks
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php?p=phukien');
@@ -25,15 +45,43 @@ $category_id = isset($_POST['category_id']) ? $_POST['category_id'] : null;
 $new_category_name = isset($_POST['new_category_name']) ? trim($_POST['new_category_name']) : '';
 
 if ($category_id === 'new' && !empty($new_category_name)) {
-    // Thêm danh mục mới vào database
-    $insert_cat_sql = "INSERT INTO categories (name, created_at) VALUES (?, NOW())";
+    // Tạo slug và thêm danh mục mới vào database với các cột bắt buộc
+    $slug = make_slug($new_category_name);
+    $insert_cat_sql = "INSERT INTO categories (name, slug, type, parent_id, created_at) VALUES (?, ?, 'ACCESSORY', NULL, NOW())";
     $cat_stmt = $conn->prepare($insert_cat_sql);
-    $cat_stmt->bind_param('s', $new_category_name);
-    $cat_stmt->execute();
-    $category_id = $conn->insert_id;
-    $cat_stmt->close();
+    if (!$cat_stmt) {
+        die('Lỗi khởi tạo truy vấn danh mục: ' . $conn->error);
+    }
+    $cat_stmt->bind_param('ss', $new_category_name, $slug);
+    if (!$cat_stmt->execute()) {
+        // Nếu trùng slug, thử lấy lại id danh mục đã tồn tại
+        $cat_stmt->close();
+        $find_sql = "SELECT id FROM categories WHERE slug = ? LIMIT 1";
+        $find_stmt = $conn->prepare($find_sql);
+        if ($find_stmt) {
+            $find_stmt->bind_param('s', $slug);
+            $find_stmt->execute();
+            $res = $find_stmt->get_result();
+            $row = $res ? $res->fetch_assoc() : null;
+            $category_id = $row['id'] ?? 0;
+            $find_stmt->close();
+        } else {
+            $category_id = 0;
+        }
+        if ($category_id <= 0) {
+            die('Không thể tạo hoặc tìm danh mục. Slug có thể đã tồn tại.');
+        }
+    } else {
+        $category_id = $conn->insert_id;
+        $cat_stmt->close();
+    }
 } else {
     $category_id = (int)$category_id;
+}
+
+// Validate category_id exists
+if ($category_id <= 0) {
+    die('Vui lòng chọn danh mục hợp lệ');
 }
 
 // Collect and validate POST data

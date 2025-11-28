@@ -54,6 +54,19 @@ $conn->begin_transaction();
 
 try {
     $user_id = $_SESSION['user_id'];
+    
+    // Kiểm tra user_id có tồn tại trong bảng users không
+    $check_user = $conn->prepare("SELECT id FROM users WHERE id = ?");
+    $check_user->bind_param("i", $user_id);
+    $check_user->execute();
+    $user_result = $check_user->get_result();
+    
+    if ($user_result->num_rows === 0) {
+        $check_user->close();
+        throw new Exception("User ID không tồn tại trong hệ thống. Vui lòng đăng nhập lại.");
+    }
+    $check_user->close();
+    
     $order_code = 'ORD' . time() . rand(100, 999);
     
     // Map payment method từ frontend sang database enum

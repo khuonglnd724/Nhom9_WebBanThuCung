@@ -10,8 +10,24 @@ require_once __DIR__ . '/../connect.php';
 // Get current month and year
 $currentMonth = date('Y-m');
 $currentYear = date('Y');
+$filterType = isset($_GET['filter_type']) && in_array($_GET['filter_type'], ['month', 'year']) ? $_GET['filter_type'] : 'month';
 $selectedMonth = isset($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month']) ? $_GET['month'] : $currentMonth;
-$selectedMonthLabel = date('m/Y', strtotime($selectedMonth . '-01'));
+$selectedYear = isset($_GET['year']) && preg_match('/^\d{4}$/', $_GET['year']) ? $_GET['year'] : $currentYear;
+
+// Build filter label and conditions based on filter type
+if ($filterType === 'month') {
+    $filterLabel = date('m/Y', strtotime($selectedMonth . '-01'));
+    $revenueCondition = "DATE_FORMAT(created_at, '%Y-%m') = ?";
+    $revenueParam = $selectedMonth;
+    $orderCondition = "DATE_FORMAT(created_at, '%Y-%m') = ?";
+    $orderParam = $selectedMonth;
+} else { // year
+    $filterLabel = $selectedYear;
+    $revenueCondition = "YEAR(created_at) = ?";
+    $revenueParam = $selectedYear;
+    $orderCondition = "YEAR(created_at) = ?";
+    $orderParam = $selectedYear;
+}
 
 // Total revenue (all time) - only COMPLETED
 $stmt = $conn->prepare("SELECT SUM(total_amount) as total_revenue FROM orders WHERE status = 'COMPLETED'");
@@ -19,11 +35,11 @@ $stmt->execute();
 $totalRevenue = $stmt->get_result()->fetch_assoc()['total_revenue'] ?? 0;
 $stmt->close();
 
-// Monthly revenue (selected month) - only COMPLETED
-$stmt = $conn->prepare("SELECT SUM(total_amount) as monthly_revenue FROM orders WHERE DATE_FORMAT(created_at, '%Y-%m') = ? AND status = 'COMPLETED'");
-$stmt->bind_param('s', $selectedMonth);
+// Filtered revenue - only COMPLETED
+$stmt = $conn->prepare("SELECT SUM(total_amount) as filtered_revenue FROM orders WHERE " . $revenueCondition . " AND status = 'COMPLETED'");
+$stmt->bind_param('s', $revenueParam);
 $stmt->execute();
-$monthlyRevenue = $stmt->get_result()->fetch_assoc()['monthly_revenue'] ?? 0;
+$filteredRevenue = $stmt->get_result()->fetch_assoc()['filtered_revenue'] ?? 0;
 $stmt->close();
 
 // Total orders
@@ -32,11 +48,11 @@ $stmt->execute();
 $totalOrders = $stmt->get_result()->fetch_assoc()['total_orders'] ?? 0;
 $stmt->close();
 
-// Monthly orders (selected month, all statuses)
-$stmt = $conn->prepare("SELECT COUNT(*) as monthly_orders FROM orders WHERE DATE_FORMAT(created_at, '%Y-%m') = ?");
-$stmt->bind_param('s', $selectedMonth);
+// Filtered orders (all statuses)
+$stmt = $conn->prepare("SELECT COUNT(*) as filtered_orders FROM orders WHERE " . $orderCondition);
+$stmt->bind_param('s', $orderParam);
 $stmt->execute();
-$monthlyOrders = $stmt->get_result()->fetch_assoc()['monthly_orders'] ?? 0;
+$filteredOrders = $stmt->get_result()->fetch_assoc()['filtered_orders'] ?? 0;
 $stmt->close();
 
 // Orders by status (all time)
@@ -109,18 +125,49 @@ $statusLabels = [
 
 <h2 class="page-title">Thống Kê</h2>
 
-<!-- Month Filter -->
-<form method="get" action="index.php" style="margin:18px 0 24px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:flex-start;">
+<!-- Filter Form -->
+<form method="get" action="index.php" style="margin:18px 0 24px; display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;">
     <input type="hidden" name="p" value="thongke" />
-    <div style="display:flex; align-items:center; gap:10px; background:#f8f9fa; border-radius:8px; padding:10px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-        <label for="month" style="font-size:15px; color:#333; font-weight:500; margin-right:4px;">Chọn tháng</label>
-        <input type="month" id="month" name="month" value="<?php echo htmlspecialchars($selectedMonth); ?>" style="padding:6px 12px; border:1px solid #ccc; border-radius:6px; font-size:15px; background:#fff; color:#222; outline:none; transition:border-color 0.2s;" onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ccc'" />
+    
+    <!-- Filter Type Selection -->
+    <div style="background:#f8f9fa; border-radius:8px; padding:12px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div style="font-size:14px; color:#333; font-weight:600; margin-bottom:10px;">Loại thống kê</div>
+        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="radio" name="filter_type" value="month" <?php echo $filterType === 'month' ? 'checked' : ''; ?> onchange="toggleFilterInputs(this.value)" />
+                <span style="font-size:14px;">Theo tháng</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="radio" name="filter_type" value="year" <?php echo $filterType === 'year' ? 'checked' : ''; ?> onchange="toggleFilterInputs(this.value)" />
+                <span style="font-size:14px;">Theo năm</span>
+            </label>
+        </div>
     </div>
-    <button type="submit" class="btn-submit" style="display:flex; align-items:center; gap:6px; background:linear-gradient(90deg,#007bff 60%,#17a2b8 100%); color:#fff; border:none; border-radius:7px; padding:6px 16px; font-size:14px; font-weight:500; box-shadow:0 1px 4px rgba(0,0,0,0.07); cursor:pointer; transition:background 0.2s; min-width:70px; height:32px;">
+    
+    <!-- Month Input -->
+    <div id="monthInput" style="display:<?php echo $filterType === 'month' ? 'flex' : 'none'; ?>; align-items:center; gap:10px; background:#f8f9fa; border-radius:8px; padding:10px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <label for="month" style="font-size:15px; color:#333; font-weight:500; margin-right:4px;">Chọn tháng</label>
+        <input type="month" id="month" name="month" value="<?php echo htmlspecialchars($selectedMonth); ?>" style="padding:6px 12px; border:1px solid #ccc; border-radius:6px; font-size:15px; background:#fff; color:#222; outline:none;" />
+    </div>
+    
+    <!-- Year Input -->
+    <div id="yearInput" style="display:<?php echo $filterType === 'year' ? 'flex' : 'none'; ?>; align-items:center; gap:10px; background:#f8f9fa; border-radius:8px; padding:10px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <label for="year" style="font-size:15px; color:#333; font-weight:500; margin-right:4px;">Chọn năm</label>
+        <input type="number" id="year" name="year" value="<?php echo htmlspecialchars($selectedYear); ?>" min="2020" max="2099" style="padding:6px 12px; border:1px solid #ccc; border-radius:6px; font-size:15px; background:#fff; color:#222; outline:none; width:100px;" />
+    </div>
+    
+    <button type="submit" class="btn-submit" style="display:flex; align-items:center; gap:6px; background:linear-gradient(90deg,#007bff 60%,#17a2b8 100%); color:#fff; border:none; border-radius:7px; padding:8px 20px; font-size:14px; font-weight:500; box-shadow:0 1px 4px rgba(0,0,0,0.07); cursor:pointer; transition:background 0.2s;">
         <i class="fas fa-filter" aria-hidden="true" style="font-size:15px;"></i>
         <span>Áp dụng</span>
     </button>
 </form>
+
+<script>
+function toggleFilterInputs(type) {
+    document.getElementById('monthInput').style.display = type === 'month' ? 'flex' : 'none';
+    document.getElementById('yearInput').style.display = type === 'year' ? 'flex' : 'none';
+}
+</script>
 
 <!-- Summary Cards -->
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin:20px 0;">
@@ -138,8 +185,8 @@ $statusLabels = [
         <div style="display:flex; align-items:center; gap:12px;">
             <i class="fas fa-chart-line" style="font-size:28px; color:#17a2b8;"></i>
             <div>
-                <div style="font-size:12px; color:#666;">Doanh thu tháng <?php echo htmlspecialchars($selectedMonthLabel); ?> (COMPLETED)</div>
-                <div style="font-size:20px; font-weight:600;"><?php echo number_format($monthlyRevenue, 0, ',', '.'); ?> đ</div>
+                <div style="font-size:12px; color:#666;">Doanh thu <?php echo $filterType === 'month' ? 'tháng' : ($filterType === 'year' ? 'năm' : ''); ?> <?php echo htmlspecialchars($filterLabel); ?> (COMPLETED)</div>
+                <div style="font-size:20px; font-weight:600;"><?php echo number_format($filteredRevenue, 0, ',', '.'); ?> đ</div>
             </div>
         </div>
     </div>
@@ -148,8 +195,8 @@ $statusLabels = [
         <div style="display:flex; align-items:center; gap:12px;">
             <i class="fas fa-shopping-cart" style="font-size:28px; color:#ffc107;"></i>
             <div>
-                <div style="font-size:12px; color:#666;">Đơn hàng tháng <?php echo htmlspecialchars($selectedMonthLabel); ?></div>
-                <div style="font-size:20px; font-weight:600;"><?php echo number_format($monthlyOrders, 0, ',', '.'); ?></div>
+                <div style="font-size:12px; color:#666;">Đơn hàng <?php echo $filterType === 'month' ? 'tháng' : ($filterType === 'year' ? 'năm' : ''); ?> <?php echo htmlspecialchars($filterLabel); ?></div>
+                <div style="font-size:20px; font-weight:600;"><?php echo number_format($filteredOrders, 0, ',', '.'); ?></div>
             </div>
         </div>
     </div>
