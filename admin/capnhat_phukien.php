@@ -145,7 +145,7 @@ try {
             WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('issssssdsii', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $is_visible, $id);
+    $stmt->bind_param('issssssdii', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $is_visible, $id);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi cập nhật phụ kiện: ' . $stmt->error);

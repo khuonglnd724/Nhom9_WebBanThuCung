@@ -29,6 +29,7 @@ if ($conn && !$conn->connect_error) {
   // Xây WHERE theo filter
   $conditions = [];
   $conditions[] = "a.is_visible = 1"; // Chỉ hiển thị phụ kiện visible
+  $conditions[] = "a.stock > 0"; // Chỉ hiển thị phụ kiện còn hàng
   if ($categoryId > 0) { $conditions[] = "a.category_id = $categoryId"; }
   // Lọc theo giá phù hợp phụ kiện (VND)
   // low: dưới 100k; mid: 100k–300k; high: 300k–700k; over: trên 700k
