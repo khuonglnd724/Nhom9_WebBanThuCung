@@ -1,0 +1,99 @@
+BÁO CÁO SỬ DỤNG CÁC BẢNG TRONG CSDL (databaseweb)
+
+1) Bảng accessories
+- Mục đích: Lưu thông tin các sản phẩm phụ kiện (tên, thương hiệu, chất liệu, kích cỡ, mô tả, giá, tồn kho).
+- Cột quan trọng:
+  + category_id: liên kết tới categories.id
+  + price, stock: giá bán và số lượng tồn
+  + is_visible (tinyint 0/1): điều khiển ẩn/hiện phụ kiện trên giao diện (đã thay thế hoàn toàn cho cột status trước đây)
+  + created_at, updated_at: thời gian tạo/cập nhật
+- Ràng buộc/Chỉ mục: FK category_id → categories(id); idx_accessories_category, idx_accessories_visible
+- Nơi sử dụng trong mã nguồn:
+  + frontend/category.php: danh sách phụ kiện theo danh mục + lọc giá; chỉ lấy a.is_visible = 1
+  + frontend/index.php: hiển thị phụ kiện nổi bật/trang chủ
+  + frontend/accessory-modal.php: modal chi tiết phụ kiện
+  + admin/phukien.php: trang quản trị danh sách phụ kiện + nút ẩn/hiện (UPDATE is_visible = NOT is_visible)
+  + admin/them_phukien.php + admin/luu_phukien.php: form & xử lý thêm mới (ghi is_visible theo “ẩn khi tạo”)
+  + admin/sua_phukien.php + admin/capnhat_phukien.php: form & xử lý cập nhật (không dùng status, chỉ dùng is_visible)
+
+2) Bảng breeds
+- Mục đích: Danh mục giống cho thú cưng, tách theo pet_type (DOG/CAT).
+- Cột chính: name, pet_type, description.
+- Quan hệ: pets.breed_id → breeds.id
+- Nơi sử dụng:
+  + frontend/pet.php & menu điều hướng: lọc theo giống; danh mục giống trong header
+  + admin/them_thucung.php: chọn giống sẵn có hoặc thêm giống mới theo pet_type
+
+3) Bảng cart
+- Mục đích: Lưu giỏ hàng theo người dùng (user_id), cho cả 2 loại sản phẩm PET/ACCESSORY.
+- Cột chính: user_id, item_type ('PET'|'ACCESSORY'), item_id, quantity.
+- Chỉ mục: unique_cart_item (user_id, item_type, item_id) đảm bảo mỗi người dùng chỉ có 1 dòng cho mỗi sản phẩm.
+- Nơi sử dụng:
+  + frontend/cart.php: hiển thị và thao tác giỏ hàng
+  + frontend/api/cart_sync.php: đồng bộ giỏ hàng
+  + assets/js/cart.js: thao tác thêm/xóa/cập nhật từ phía client
+
+4) Bảng categories
+- Mục đích: Danh mục cho sản phẩm. type gồm 'PET' | 'ACCESSORY' | 'BOTH'.
+- Cột chính: name, slug, type, parent_id.
+- Nơi sử dụng:
+  + frontend/header/menu: liệt kê danh mục phụ kiện
+  + frontend/category.php: lọc theo category_id (phụ kiện)
+  + admin/them_phukien.php: chọn danh mục ACCESSORY hoặc tạo mới
+  + admin/phukien.php: hiển thị tên danh mục của phụ kiện (JOIN categories)
+
+5) Bảng images
+- Mục đích: Lưu đường dẫn ảnh cho cả PET và ACCESSORY.
+- Cột chính: item_type ('PET'|'ACCESSORY'), item_id, image_url, display_order, is_primary.
+- Chỉ mục: idx_images_item, idx_images_primary.
+- Nơi sử dụng:
+  + Frontend: lấy ảnh hiển thị sản phẩm (ưu tiên ảnh is_primary, nếu có)
+  + Admin: khi thêm/sửa sản phẩm, tải ảnh lên và ghi vào bảng images; cập nhật ảnh chính nếu thay đổi
+
+6) Bảng orders
+- Mục đích: Lưu thông tin đơn hàng.
+- Cột quan trọng: user_id, order_code, recipient_name, total_amount, status (PENDING/CONFIRMED/SHIPPED/COMPLETED/CANCELED), payment_method, shipping_address, phone, notes.
+- Chỉ mục: idx_orders_user, idx_orders_status.
+- Nơi sử dụng:
+  + frontend/thanhtoan.php: tạo đơn hàng khi thanh toán
+  + frontend/order-tracking.php: theo dõi trạng thái đơn hàng
+  + frontend/order-history.php: lịch sử đơn theo người dùng
+  + admin/donhang.php, admin/chi_tiet_don_hang.php, admin/capnhat_trangthai_donhang.php, admin/hoantat_donhang.php: quản trị đơn hàng và cập nhật trạng thái
+- Ghi chú: status của đơn hàng vẫn được sử dụng đầy đủ (không bị loại bỏ như status của sản phẩm).
+
+7) Bảng order_details
+- Mục đích: Chi tiết dòng hàng của mỗi đơn (sản phẩm, số lượng, đơn giá, thành tiền).
+- Cột chính: order_id, item_type, item_id, quantity, unit_price, line_total.
+- Trigger liên quan:
+  + trg_order_details_after_change / after_delete / after_update: tự động cập nhật orders.total_amount theo tổng line_total của các dòng trong đơn tương ứng.
+- Nơi sử dụng:
+  + frontend/thanhtoan.php: ghi chi tiết đơn khi đặt hàng
+  + admin/chi_tiet_don_hang.php: xem chi tiết đơn hàng
+
+8) Bảng pets
+- Mục đích: Lưu thông tin thú cưng (tên, giống, giới tính, tuổi, màu, kích thước, mô tả, giá, tồn kho).
+- Cột quan trọng:
+  + category_id → categories.id
+  + breed_id → breeds.id (có thể NULL)
+  + is_visible (tinyint 0/1): điều khiển ẩn/hiện thú cưng trên giao diện (thay thế cho status cũ)
+- Nơi sử dụng:
+  + frontend/pet.php, frontend/product-modal.php, frontend/index.php: hiển thị danh sách/chi tiết thú cưng
+  + admin/thucung.php: danh sách thú cưng và toggle ẩn/hiện
+  + admin/them_thucung.php + admin/xuly_them_thucung.php: thêm mới (hỗ trợ “ẩn khi tạo” → ghi is_visible)
+  + admin/sua_thucung.php + admin/xuly_sua_thucung.php: chỉnh sửa thông tin thú cưng
+
+9) Bảng users
+- Mục đích: Lưu người dùng (quản trị và khách hàng).
+- Cột chính: full_name, email, password_hash, phone, role ('ADMIN'|'CUSTOMER'), status ('ACTIVE'|'INACTIVE').
+- Nơi sử dụng:
+  + frontend/login.php, frontend/register.php: đăng nhập/đăng ký
+  + admin/user.php: xem/quản lý người dùng
+  + Liên kết với orders qua user_id.
+
+10) Liên kết bảng chính
+- accessories.category_id → categories.id
+- pets.category_id → categories.id
+- pets.breed_id → breeds.id
+- images.(item_type,item_id) → {pets.id|accessories.id} theo item_type
+- orders.user_id → users.id
+- order_details.order_id → orders.id
