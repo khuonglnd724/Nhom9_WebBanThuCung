@@ -71,9 +71,6 @@ $stmt->close();
         </button>
     </form>
     
-    <a href="index.php?p=them_user" class="btn-add">
-        <i class="fas fa-user-plus"></i> Thêm Người Dùng
-    </a>
 </div>
 
 <table class="pet-table">
