@@ -1,4 +1,4 @@
-BÁO CÁO SỬ DỤNG CÁC BẢNG TRONG CSDL (databaseweb)
+BÁO CÁO SỬ DỤNG CÁC BẢNG TRONG CSDL (databaseweb).
 
 1) Bảng accessories
 - Mục đích: Lưu thông tin các sản phẩm phụ kiện (tên, thương hiệu, chất liệu, kích cỡ, mô tả, giá, tồn kho).
