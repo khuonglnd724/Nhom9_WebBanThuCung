@@ -55,7 +55,7 @@ if ($conn && !$conn->connect_error) {
   $offset = ($page - 1) * $limit;
   // whereSql đã bao gồm mọi điều kiện
   $sqlPets = <<<SQL
-SELECT p.id, p.name, p.price, p.stock, p.status, p.description, p.age_months, p.color, p.size, p.gender, p.created_at,
+SELECT p.id, p.name, p.price, p.stock, p.description, p.age_months, p.color, p.size, p.gender, p.created_at,
        b.name AS breed_name,
        (SELECT image_url FROM images i
           WHERE i.item_type='PET' AND i.item_id = p.id
@@ -274,8 +274,7 @@ SQL;
               $dataAttrs .= 'data-color="' . htmlspecialchars($row['color'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
               $dataAttrs .= 'data-size="' . htmlspecialchars($row['size'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
               $dataAttrs .= 'data-gender="' . ($row['gender'] === 'MALE' ? 'Đực' : ($row['gender'] === 'FEMALE' ? 'Cái' : 'Chưa rõ')) . '" ';
-              $statusText = ($row['status'] === 'AVAILABLE' ? 'Còn hàng' : ($row['status'] === 'SOLD' ? 'Đã bán' : 'Ẩn'));
-              $dataAttrs .= 'data-status="' . $statusText . '" ';
+              $dataAttrs .= 'data-status="Hiển thị" ';
               $dataAttrs .= 'data-description="' . htmlspecialchars($row['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
               echo '<article class="product-card">';
               echo '  <div class="thumb"><img src="' . htmlspecialchars($img) . '" alt="' . htmlspecialchars($row['name']) . '"></div>';

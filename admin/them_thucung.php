@@ -102,12 +102,10 @@ if ($breeds_result) {
     </div>
 
     <div>
-        <label for="status">Trạng thái:</label>
-        <select id="status" name="status">
-            <option value="AVAILABLE">AVAILABLE</option>
-            <option value="SOLD">SOLD</option>
-            <option value="HIDDEN">HIDDEN</option>
-        </select>
+        <label>
+            <input type="checkbox" name="is_invisible" value="1">
+            Ẩn sản phẩm sau khi tạo
+        </label>
     </div>
 
     <div>

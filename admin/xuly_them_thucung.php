@@ -17,8 +17,9 @@ $color = trim($_POST['color'] ?? '');
 $size = $_POST['size'] ?? '';
 $gia = floatval($_POST['gia'] ?? 0);
 $stock = intval($_POST['stock'] ?? 1);
-$status = $_POST['status'] ?? 'AVAILABLE';
 $mota = trim($_POST['mota'] ?? '');
+$is_invisible = isset($_POST['is_invisible']) ? 1 : 0;
+$is_visible = $is_invisible ? 0 : 1;
 
 // Xử lý giống mới nếu chọn "new"
 $breed_id = null;
@@ -96,11 +97,11 @@ $conn->begin_transaction();
 
 try {
     // Insert vào bảng pets
-    $sql = "INSERT INTO pets (category_id, name, breed_id, gender, age_months, color, size, description, price, stock, status, created_at, updated_at) 
+    $sql = "INSERT INTO pets (category_id, name, breed_id, gender, age_months, color, size, description, price, stock, is_visible, created_at, updated_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('isisssssdis', $category_id, $ten, $breed_id, $gioi_tinh, $age_months, $color, $size, $mota, $gia, $stock, $status);
+    $stmt->bind_param('isisisssdii', $category_id, $ten, $breed_id, $gioi_tinh, $age_months, $color, $size, $mota, $gia, $stock, $is_visible);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi thêm thú cưng: ' . $stmt->error);

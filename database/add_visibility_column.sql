@@ -1,31 +1,13 @@
--- Migration: Thêm cột is_visible vào bảng pets và accessories
--- Chạy script này để cập nhật database hiện có
-
--- Thêm cột is_visible vào bảng pets
-ALTER TABLE pets 
-ADD COLUMN is_visible BOOLEAN NOT NULL DEFAULT TRUE AFTER status,
-ADD INDEX idx_pets_visible (is_visible);
-
--- Thêm cột is_visible vào bảng accessories
-ALTER TABLE accessories 
-ADD COLUMN is_visible BOOLEAN NOT NULL DEFAULT TRUE AFTER status,
-ADD INDEX idx_accessories_visible (is_visible);
-
--- Cập nhật tất cả sản phẩm hiện có thành visible (TRUE)
-UPDATE pets SET is_visible = TRUE WHERE is_visible IS NULL;
-UPDATE accessories SET is_visible = TRUE WHERE is_visible IS NULL;
-
--- Kiểm tra kết quả
-SELECT 'Pets table:' as info, 
-       COUNT(*) as total, 
-       SUM(is_visible) as visible, 
-       COUNT(*) - SUM(is_visible) as hidden 
-FROM pets;
-
-SELECT 'Accessories table:' as info, 
-       COUNT(*) as total, 
-       SUM(is_visible) as visible, 
-       COUNT(*) - SUM(is_visible) as hidden 
-FROM accessories;
-
-SELECT 'Migration completed successfully!' AS message;
+-- Deprecated migration script (status columns removed from base schema).
+-- is_visible is now part of the initial table definitions in databaseweb.sql.
+-- This file retained only for historical reference and should NOT be executed
+-- on a fresh schema. If upgrading an old schema that still has status and
+-- lacks is_visible, perform manual ALTERs:
+--   ALTER TABLE pets ADD COLUMN is_visible TINYINT(1) NOT NULL DEFAULT 1 AFTER price, ADD INDEX idx_pets_visible (is_visible);
+--   ALTER TABLE accessories ADD COLUMN is_visible TINYINT(1) NOT NULL DEFAULT 1 AFTER price, ADD INDEX idx_accessories_visible (is_visible);
+-- Then optionally set all existing rows visible:
+--   UPDATE pets SET is_visible = 1 WHERE is_visible IS NULL;
+--   UPDATE accessories SET is_visible = 1 WHERE is_visible IS NULL;
+-- Verification queries:
+--   SELECT 'pets' AS tbl, COUNT(*) total, SUM(is_visible) visible, COUNT(*)-SUM(is_visible) hidden FROM pets;
+--   SELECT 'accessories' AS tbl, COUNT(*) total, SUM(is_visible) visible, COUNT(*)-SUM(is_visible) hidden FROM accessories;

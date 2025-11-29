@@ -37,7 +37,7 @@ CREATE TABLE `accessories` (
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT 0,
-  `status` enum('ACTIVE','INACTIVE','OUT_OF_STOCK') NOT NULL DEFAULT 'ACTIVE',
+  -- REMOVED status; use is_visible for UI visibility
   `is_visible` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -47,28 +47,28 @@ CREATE TABLE `accessories` (
 -- Đang đổ dữ liệu cho bảng `accessories`
 --
 
-INSERT INTO `accessories` (`id`, `category_id`, `name`, `brand`, `material`, `size`, `description`, `price`, `stock`, `status`, `is_visible`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Hạt khô cho chó vị bò', 'PetFood', 'Ngũ cốc', '2kg', 'Dinh dưỡng cao', 220000.00, 30, 'ACTIVE', 1, '2025-11-28 15:55:24', '2025-11-28 15:55:24'),
-(2, 4, 'Pate cho mèo vị gà', 'CatCare', 'Thịt', '400g', 'Dễ tiêu hóa', 65000.00, 50, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:18:42'),
-(3, 5, 'Bóng cao su phát sáng', 'PlayPet', 'Cao su', 'Nhỏ', 'Đồ chơi ban đêm', 35000.00, 100, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:18:34'),
-(4, 5, 'Xương gặm sạch răng', 'PlayPet', 'Nhựa an toàn', 'Trung bình', 'Giúp sạch răng', 55000.00, 60, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:18:24'),
-(5, 5, 'Chuột giả kêu', 'PlayPet', 'Vải', 'Nhỏ', 'Mèo thích đuổi bắt', 28000.00, 80, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:18:14'),
-(6, 6, 'Cát vệ sinh cho mèo', 'CleanPet', 'Khoáng', '10L', 'Hút mùi tốt', 120000.00, 40, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:18:03'),
-(7, 6, 'Bàn chải lông', 'CleanPet', 'Nhựa + Inox', 'Nhỏ', 'Chải lông rụng', 45000.00, 35, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:17:56'),
-(8, 6, 'Dầu tắm khử mùi cho chó', 'CleanPet', 'Dung dịch', '250ml', 'Mùi dễ chịu', 90000.00, 25, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:17:34'),
-(9, 7, 'Chuồng chó kích thước trung', 'SafeHome', 'Kim loại', 'Trung', 'Thoáng khí', 650000.00, 10, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:16:54'),
-(10, 3, 'Snack thưởng huấn luyện', 'PetFood', 'Thịt', '200g', 'Thưởng khi nghe lệnh', 75000.00, 45, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:16:35'),
-(11, 4, 'Vitamin tổng hợp cho mèo', 'CatCare', 'Viên', 'Hộp', 'Tăng đề kháng', 150000.00, 18, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:16:20'),
-(12, 5, 'Dây dắt chó phản quang', 'PlayPet', 'Nylon', 'M', 'An toàn ban đêm', 95000.00, 22, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:15:40'),
-(13, 5, 'Vòng cổ tên khắc', 'PlayPet', 'Da', 'S', 'Khắc tên pet', 110000.00, 30, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:15:30'),
-(14, 6, 'Bình nước tự động', 'CleanPet', 'Nhựa', '500ml', 'Giữ sạch nước', 60000.00, 33, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:15:18'),
-(15, 6, 'Khay vệ sinh cho mèo', 'CleanPet', 'Nhựa', 'Trung', 'Dễ vệ sinh', 85000.00, 27, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:15:02'),
-(16, 7, 'Nhà gỗ cho mèo', 'SafeHome', 'Gỗ', 'Trung', 'ấm áp, bền', 520000.00, 9, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:14:51'),
-(17, 7, 'Chuồng gấp cho chó', 'SafeHome', 'Kim loại', 'Lớn', 'Gấp gọn tiện', 780000.00, 6, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:14:36'),
-(18, 6, 'Tông đơ cắt lông', 'CleanPet', 'Nhựa + Kim loại', '--', 'Êm, ít ồn', 230000.00, 11, '', 1, '2025-11-28 15:55:24', '2025-11-28 16:14:13'),
-(19, 8, 'Bát', 'SafeHome', 'Nhựa', 'Trung', 'Bát ăn sạch đẹp', 30000.00, 30, 'ACTIVE', 1, '2025-11-28 15:57:48', '2025-11-28 15:57:48'),
-(20, 8, 'Bát chống ăn nhanh siêu cấp', 'SafeHome', 'Nhựa', 'Trung', 'Chống cho thú cưng ăn nhanh dẫn đến vấn đề về tiêu hóa', 50000.00, 19, 'ACTIVE', 1, '2025-11-28 16:05:53', '2025-11-28 16:08:42'),
-(21, 3, 'Pate siêu dinh dưỡng', 'PetFood', 'Gà, cá', '1 bịch', 'Pate cho chó', 30000.00, 2, 'ACTIVE', 1, '2025-11-28 16:12:28', '2025-11-28 16:12:28');
+INSERT INTO `accessories` (`id`, `category_id`, `name`, `brand`, `material`, `size`, `description`, `price`, `stock`, `is_visible`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Hạt khô cho chó vị bò', 'PetFood', 'Ngũ cốc', '2kg', 'Dinh dưỡng cao', 220000.00, 30, 1, '2025-11-28 15:55:24', '2025-11-28 15:55:24'),
+(2, 4, 'Pate cho mèo vị gà', 'CatCare', 'Thịt', '400g', 'Dễ tiêu hóa', 65000.00, 50, 1, '2025-11-28 15:55:24', '2025-11-28 16:18:42'),
+(3, 5, 'Bóng cao su phát sáng', 'PlayPet', 'Cao su', 'Nhỏ', 'Đồ chơi ban đêm', 35000.00, 100,  1, '2025-11-28 15:55:24', '2025-11-28 16:18:34'),
+(4, 5, 'Xương gặm sạch răng', 'PlayPet', 'Nhựa an toàn', 'Trung bình', 'Giúp sạch răng', 55000.00, 60,  1, '2025-11-28 15:55:24', '2025-11-28 16:18:24'),
+(5, 5, 'Chuột giả kêu', 'PlayPet', 'Vải', 'Nhỏ', 'Mèo thích đuổi bắt', 28000.00, 80, 1, '2025-11-28 15:55:24', '2025-11-28 16:18:14'),
+(6, 6, 'Cát vệ sinh cho mèo', 'CleanPet', 'Khoáng', '10L', 'Hút mùi tốt', 120000.00, 40, 1, '2025-11-28 15:55:24', '2025-11-28 16:18:03'),
+(7, 6, 'Bàn chải lông', 'CleanPet', 'Nhựa + Inox', 'Nhỏ', 'Chải lông rụng', 45000.00, 35, 1, '2025-11-28 15:55:24', '2025-11-28 16:17:56'),
+(8, 6, 'Dầu tắm khử mùi cho chó', 'CleanPet', 'Dung dịch', '250ml', 'Mùi dễ chịu', 90000.00, 25, 1, '2025-11-28 15:55:24', '2025-11-28 16:17:34'),
+(9, 7, 'Chuồng chó kích thước trung', 'SafeHome', 'Kim loại', 'Trung', 'Thoáng khí', 650000.00, 10, 1, '2025-11-28 15:55:24', '2025-11-28 16:16:54'),
+(10, 3, 'Snack thưởng huấn luyện', 'PetFood', 'Thịt', '200g', 'Thưởng khi nghe lệnh', 75000.00, 45, 1, '2025-11-28 15:55:24', '2025-11-28 16:16:35'),
+(11, 4, 'Vitamin tổng hợp cho mèo', 'CatCare', 'Viên', 'Hộp', 'Tăng đề kháng', 150000.00, 18, 1, '2025-11-28 15:55:24', '2025-11-28 16:16:20'),
+(12, 5, 'Dây dắt chó phản quang', 'PlayPet', 'Nylon', 'M', 'An toàn ban đêm', 95000.00, 22, 1, '2025-11-28 15:55:24', '2025-11-28 16:15:40'),
+(13, 5, 'Vòng cổ tên khắc', 'PlayPet', 'Da', 'S', 'Khắc tên pet', 110000.00, 30, 1, '2025-11-28 15:55:24', '2025-11-28 16:15:30'),
+(14, 6, 'Bình nước tự động', 'CleanPet', 'Nhựa', '500ml', 'Giữ sạch nước', 60000.00, 33, 1, '2025-11-28 15:55:24', '2025-11-28 16:15:18'),
+(15, 6, 'Khay vệ sinh cho mèo', 'CleanPet', 'Nhựa', 'Trung', 'Dễ vệ sinh', 85000.00, 27, 1, '2025-11-28 15:55:24', '2025-11-28 16:15:02'),
+(16, 7, 'Nhà gỗ cho mèo', 'SafeHome', 'Gỗ', 'Trung', 'ấm áp, bền', 520000.00, 9, 1, '2025-11-28 15:55:24', '2025-11-28 16:14:51'),
+(17, 7, 'Chuồng gấp cho chó', 'SafeHome', 'Kim loại', 'Lớn', 'Gấp gọn tiện', 780000.00, 6, 1, '2025-11-28 15:55:24', '2025-11-28 16:14:36'),
+(18, 6, 'Tông đơ cắt lông', 'CleanPet', 'Nhựa + Kim loại', '--', 'Êm, ít ồn', 230000.00, 11, 1, '2025-11-28 15:55:24', '2025-11-28 16:14:13'),
+(19, 8, 'Bát', 'SafeHome', 'Nhựa', 'Trung', 'Bát ăn sạch đẹp', 30000.00, 30, 1, '2025-11-28 15:57:48', '2025-11-28 15:57:48'),
+(20, 8, 'Bát chống ăn nhanh siêu cấp', 'SafeHome', 'Nhựa', 'Trung', 'Chống cho thú cưng ăn nhanh dẫn đến vấn đề về tiêu hóa', 50000.00, 19, 1, '2025-11-28 16:05:53', '2025-11-28 16:08:42'),
+(21, 3, 'Pate siêu dinh dưỡng', 'PetFood', 'Gà, cá', '1 bịch', 'Pate cho chó', 30000.00, 2, 1, '2025-11-28 16:12:28', '2025-11-28 16:12:28');
 
 -- --------------------------------------------------------
 
@@ -336,7 +336,6 @@ CREATE TABLE `pets` (
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `stock` int(11) NOT NULL DEFAULT 1,
-  `status` enum('AVAILABLE','SOLD','HIDDEN') NOT NULL DEFAULT 'AVAILABLE',
   `is_visible` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -346,17 +345,16 @@ CREATE TABLE `pets` (
 -- Đang đổ dữ liệu cho bảng `pets`
 --
 
-INSERT INTO `pets` (`id`, `category_id`, `name`, `breed_id`, `gender`, `age_months`, `color`, `size`, `description`, `price`, `stock`, `status`, `is_visible`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Lucky', 1, 'MALE', 8, 'Trắng', 'Nhỏ', 'Chó Poodle lông xoăn khỏe mạnh', 3500000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(2, 1, 'Bống', 2, 'FEMALE', 6, 'Vàng', 'Nhỏ', 'Phốc sóc năng động', 4200000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(3, 1, 'Milo', 3, 'MALE', 10, 'Vàng', 'Lớn', 'Golden thân thiện', 8000000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(4, 2, 'Mướp', 5, 'FEMALE', 12, 'Xám vằn', 'Trung bình', 'Mèo ta khỏe mạnh', 900000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(5, 2, 'Snow', 6, 'MALE', 7, 'Trắng', 'Trung bình', 'Lông dài mượt', 4500000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(6, 2, 'Cookie', 7, 'FEMALE', 5, 'Kem', 'Nhỏ', 'Tai cụp dễ thương', 5000000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(7, 1, 'Coco', 4, 'FEMALE', 9, 'Vàng trắng', 'Trung bình', 'Chân ngắn đáng yêu', 9500000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
-(8, 2, 'Leo', 8, 'MALE', 8, 'Đốm nâu', 'Trung bình', 'Hoa văn độc đáo', 7000000.00, 1, 'AVAILABLE', 1, '2025-11-28 15:55:23', '2025-11-28 16:20:13'),
-(9, 1, 'Coco nớt', 4, 'MALE', 12, 'Trắng', 'Trung bình', 'Cute thân thiện', 5000000.00, 1, 'AVAILABLE', 1, '2025-11-28 16:03:55', '2025-11-28 16:03:55');
-
+INSERT INTO `pets` (`id`, `category_id`, `name`, `breed_id`, `gender`, `age_months`, `color`, `size`, `description`, `price`, `stock`, `is_visible`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Lucky', 1, 'MALE', 8, 'Trắng', 'Nhỏ', 'Chó Poodle lông xoăn khỏe mạnh', 3500000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(2, 1, 'Bống', 2, 'FEMALE', 6, 'Vàng', 'Nhỏ', 'Phốc sóc năng động', 4200000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(3, 1, 'Milo', 3, 'MALE', 10, 'Vàng', 'Lớn', 'Golden thân thiện', 8000000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(4, 2, 'Mướp', 5, 'FEMALE', 12, 'Xám vằn', 'Trung bình', 'Mèo ta khỏe mạnh', 900000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(5, 2, 'Snow', 6, 'MALE', 7, 'Trắng', 'Trung bình', 'Lông dài mượt', 4500000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(6, 2, 'Cookie', 7, 'FEMALE', 5, 'Kem', 'Nhỏ', 'Tai cụp dễ thương', 5000000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(7, 1, 'Coco', 4, 'FEMALE', 9, 'Vàng trắng', 'Trung bình', 'Chân ngắn đáng yêu', 9500000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 15:55:23'),
+(8, 2, 'Leo', 8, 'MALE', 8, 'Đốm nâu', 'Trung bình', 'Hoa văn độc đáo', 7000000.00, 1, 1, '2025-11-28 15:55:23', '2025-11-28 16:20:13'),
+(9, 1, 'Coco nớt', 4, 'MALE', 12, 'Trắng', 'Trung bình', 'Cute thân thiện', 5000000.00, 1, 1, '2025-11-28 16:03:55', '2025-11-28 16:03:55');
 -- --------------------------------------------------------
 
 --
@@ -397,7 +395,6 @@ CREATE TABLE `v_all_products` (
 ,`name` varchar(120)
 ,`price` decimal(10,2)
 ,`stock` int(11)
-,`status` varchar(12)
 ,`category` varchar(100)
 );
 
@@ -408,7 +405,14 @@ CREATE TABLE `v_all_products` (
 --
 DROP TABLE IF EXISTS `v_all_products`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_all_products`  AS SELECT 'PET' AS `product_type`, `p`.`id` AS `product_id`, `p`.`name` AS `name`, `p`.`price` AS `price`, `p`.`stock` AS `stock`, `p`.`status` AS `status`, `c`.`name` AS `category` FROM (`pets` `p` join `categories` `c` on(`p`.`category_id` = `c`.`id`))union all select 'ACCESSORY' AS `product_type`,`a`.`id` AS `product_id`,`a`.`name` AS `name`,`a`.`price` AS `price`,`a`.`stock` AS `stock`,`a`.`status` AS `status`,`c`.`name` AS `category` from (`accessories` `a` join `categories` `c` on(`a`.`category_id` = `c`.`id`))  ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_all_products`  AS 
+SELECT 'PET' AS `product_type`, p.id AS `product_id`, p.name AS `name`, p.price AS `price`, p.stock AS `stock`, c.name AS `category`
+FROM pets p
+JOIN categories c ON p.category_id = c.id
+UNION ALL
+SELECT 'ACCESSORY' AS `product_type`, a.id AS `product_id`, a.name AS `name`, a.price AS `price`, a.stock AS `stock`, c.name AS `category`
+FROM accessories a
+JOIN categories c ON a.category_id = c.id;
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -420,7 +424,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 ALTER TABLE `accessories`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_accessories_category` (`category_id`),
-  ADD KEY `idx_accessories_status` (`status`),
+  
   ADD KEY `idx_accessories_visible` (`is_visible`);
 
 --
@@ -478,7 +482,7 @@ ALTER TABLE `pets`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_pets_category` (`category_id`),
   ADD KEY `idx_pets_breed` (`breed_id`),
-  ADD KEY `idx_pets_status` (`status`),
+  
   ADD KEY `idx_pets_visible` (`is_visible`);
 
 --

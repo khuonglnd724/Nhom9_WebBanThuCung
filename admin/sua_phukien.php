@@ -102,14 +102,7 @@ if ($cat_result) {
         <input type="number" name="stock" value="<?= $data['stock'] ?>" required>
     </div>
 
-    <div>
-        <label>Trạng thái:</label>
-        <select name="status">
-            <option value="AVAILABLE" <?= ($data['status'] === 'AVAILABLE') ? 'selected' : '' ?>>AVAILABLE</option>
-            <option value="OUT_OF_STOCK" <?= ($data['status'] === 'OUT_OF_STOCK') ? 'selected' : '' ?>>OUT_OF_STOCK</option>
-            <option value="HIDDEN" <?= ($data['status'] === 'HIDDEN') ? 'selected' : '' ?>>HIDDEN</option>
-        </select>
-    </div>
+    <!-- Trường trạng thái đã loại bỏ; chỉ dùng is_visible để kiểm soát hiển thị -->
 
     <div>
         <label>Hiển thị trên trang chủ:</label>

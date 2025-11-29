@@ -44,7 +44,6 @@ $sql = "SELECT
             a.description, 
             a.price, 
             a.stock, 
-            a.status,
             a.is_visible,
             img.image_url,
             img.item_id as has_image
@@ -155,7 +154,7 @@ if ($cat_result) {
             <th>Mô tả</th>
             <th>Giá</th>
             <th>Tồn kho</th>
-            <th>Trạng thái</th>
+            
             <th>Hiển thị</th>
             <th>Hành động</th>
         </tr>
@@ -196,7 +195,6 @@ if ($cat_result) {
                 <td><?php echo nl2br(htmlspecialchars(substr($row['description'], 0, 120))); ?></td>
                 <td><?php echo number_format($row['price'], 0, ',', '.'); ?> đ</td>
                 <td><?php echo htmlspecialchars($row['stock']); ?></td>
-                <td><?php echo htmlspecialchars($row['status']); ?></td>
                 <td>
                     <button onclick="toggleVisibility(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($q); ?>', '<?php echo htmlspecialchars($category_filter); ?>')" 
                             style="border:none; background:none; cursor:pointer; padding:4px 8px; font-size:14px;"

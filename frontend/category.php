@@ -30,12 +30,16 @@ if ($conn && !$conn->connect_error) {
   $conditions = [];
   $conditions[] = "a.is_visible = 1"; // Chỉ hiển thị phụ kiện visible
   if ($categoryId > 0) { $conditions[] = "a.category_id = $categoryId"; }
+  // Lọc theo giá phù hợp phụ kiện (VND)
+  // low: dưới 100k; mid: 100k–300k; high: 300k–700k; over: trên 700k
   if ($priceParam === 'low') {
-    $conditions[] = "a.price < 10000000";
+    $conditions[] = "a.price < 100000";
   } elseif ($priceParam === 'mid') {
-    $conditions[] = "a.price >= 10000000 AND a.price <= 20000000";
+    $conditions[] = "a.price >= 100000 AND a.price <= 300000";
   } elseif ($priceParam === 'high') {
-    $conditions[] = "a.price > 20000000";
+    $conditions[] = "a.price > 300000 AND a.price <= 700000";
+  } elseif ($priceParam === 'over') {
+    $conditions[] = "a.price > 700000";
   }
   $whereSql = count($conditions) ? ('WHERE ' . implode(' AND ', $conditions)) : '';
 
@@ -49,7 +53,7 @@ if ($conn && !$conn->connect_error) {
   }
   $offset = ($page - 1) * $limit;
   $sqlAcc = <<<SQL
-SELECT a.id, a.name, a.price, a.stock, a.status, a.description, a.brand, a.material, a.size, a.created_at,
+SELECT a.id, a.name, a.price, a.stock, a.description, a.brand, a.material, a.size, a.created_at,
        (SELECT image_url FROM images i
           WHERE i.item_type='ACCESSORY' AND i.item_id = a.id
           ORDER BY is_primary DESC, display_order ASC, id ASC
@@ -227,9 +231,10 @@ SQL;
           </select>
           <select id="filter-price" name="price">
             <option value="">Lọc theo giá</option>
-            <option value="low" <?php echo ($priceParam==='low')?'selected':''; ?>>Dưới 10 triệu</option>
-            <option value="mid" <?php echo ($priceParam==='mid')?'selected':''; ?>>10 – 20 triệu</option>
-            <option value="high" <?php echo ($priceParam==='high')?'selected':''; ?>>Trên 20 triệu</option>
+            <option value="low" <?php echo ($priceParam==='low')?'selected':''; ?>>Dưới 100k</option>
+            <option value="mid" <?php echo ($priceParam==='mid')?'selected':''; ?>>100k – 300k</option>
+            <option value="high" <?php echo ($priceParam==='high')?'selected':''; ?>>300k – 700k</option>
+            <option value="over" <?php echo ($priceParam==='over')?'selected':''; ?>>Trên 700k</option>
           </select>
           <button id="filter-btn" class="btn btn-primary" type="submit">Lọc</button>
           <?php if ($categoryId>0 || $priceParam): ?>
@@ -243,8 +248,6 @@ SQL;
             while ($row = $accRes->fetch_assoc()) {
               $img = $row['image_url'] ? ('../' . $row['image_url']) : ('https://placehold.co/600x500?text=' . rawurlencode($row['name']));
               $price = number_format((float)$row['price'], 0, ',', '.') . '₫';
-              $statusText = ($row['status'] === 'ACTIVE') ? 'Đang bán' : (($row['status'] === 'OUT_OF_STOCK') ? 'Hết hàng' : 'Ngừng bán');
-
               $dataAttrs = 'data-id="acc-' . (int)$row['id'] . '" ';
               $dataAttrs .= 'data-name="' . htmlspecialchars($row['name'], ENT_QUOTES) . '" ';
               $dataAttrs .= 'data-price="' . htmlspecialchars($price, ENT_QUOTES) . '" ';
@@ -252,7 +255,7 @@ SQL;
               $dataAttrs .= 'data-brand="' . htmlspecialchars($row['brand'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
               $dataAttrs .= 'data-material="' . htmlspecialchars($row['material'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
               $dataAttrs .= 'data-size="' . htmlspecialchars($row['size'] ?: '—', ENT_QUOTES) . '" ';
-              $dataAttrs .= 'data-status="' . htmlspecialchars($statusText, ENT_QUOTES) . '" ';
+              $dataAttrs .= 'data-status="Hiển thị" ';
               $dataAttrs .= 'data-description="' . htmlspecialchars($row['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
 
               echo '<article class="product-card">';

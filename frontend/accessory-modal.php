@@ -8,7 +8,7 @@ require_once '../connect.php';
 // Hàm lấy thông tin phụ kiện từ database
 function getAccessoryDetails($accessoryId, $conn) {
     $conn->set_charset('utf8mb4');
-    $sql = "SELECT a.id, a.name, a.price, a.stock, a.status, a.description, 
+    $sql = "SELECT a.id, a.name, a.price, a.stock, a.description, 
                    a.brand, a.material, a.size,
                    (SELECT image_url FROM images i 
                     WHERE i.item_type='ACCESSORY' AND i.item_id=a.id 
@@ -44,7 +44,7 @@ if (isset($_GET['accessory_id'])) {
     if ($accessory) {
         $imageUrl = $accessory['image_url'] ? ('../' . $accessory['image_url']) : ('https://placehold.co/600x500?text=' . rawurlencode($accessory['name']));
         $price = number_format((float)$accessory['price'], 0, ',', '.') . '₫';
-        $statusText = ($accessory['status'] === 'ACTIVE') ? 'Đang bán' : (($accessory['status'] === 'OUT_OF_STOCK') ? 'Hết hàng' : 'Ngừng bán');
+        $statusText = 'Hiển thị';
         ?>
         <div id="accessoryModal" class="product-modal" style="display: flex;">
             <div class="product-modal-content">
@@ -55,10 +55,6 @@ if (isset($_GET['accessory_id'])) {
                     </div>
                     <div class="modal-details">
                         <h2 id="accModalName"><?php echo htmlspecialchars($accessory['name']); ?></h2>
-                        <div class="modal-rating">
-                            <span class="stars">⭐⭐⭐⭐⭐</span>
-                            <span id="accModalRating">(0 đánh giá)</span>
-                        </div>
                         <div class="modal-price">
                             <span class="current-price" id="accModalPrice"><?php echo $price; ?></span>
                         </div>
@@ -80,10 +76,6 @@ if (isset($_GET['accessory_id'])) {
                                 <tr>
                                     <td>Kích cỡ:</td>
                                     <td id="accModalSize"><?php echo htmlspecialchars($accessory['size'] ?: '—'); ?></td>
-                                </tr>
-                                <tr>
-                                    <td>Tình trạng:</td>
-                                    <td id="accModalStatus"><?php echo $statusText; ?></td>
                                 </tr>
                             </table>
                         </div>

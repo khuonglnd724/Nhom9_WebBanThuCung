@@ -217,7 +217,7 @@ require_once("../connect.php");
           require_once("../connect.php");
           if ($conn && !$conn->connect_error) {
             $conn->set_charset("utf8mb4");
-            $sql = "SELECT p.id, p.name, p.price, p.stock, p.status, p.description, p.age_months, p.color, p.size, p.gender,
+            $sql = "SELECT p.id, p.name, p.price, p.stock, p.description, p.age_months, p.color, p.size, p.gender,
                            b.name AS breed_name,
                            (SELECT image_url FROM images i
                             WHERE i.item_type='PET' AND i.item_id=p.id
@@ -244,7 +244,7 @@ require_once("../connect.php");
                 $dataAttrs .= 'data-color="' . htmlspecialchars($row['color'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
                 $dataAttrs .= 'data-size="' . htmlspecialchars($row['size'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
                 $dataAttrs .= 'data-gender="' . ($row['gender'] === 'MALE' ? 'Đực' : ($row['gender'] === 'FEMALE' ? 'Cái' : 'Chưa rõ')) . '" ';
-                $dataAttrs .= 'data-status="' . ($row['status'] === 'AVAILABLE' ? 'Còn hàng' : ($row['status'] === 'SOLD' ? 'Đã bán' : 'Không khả dụng')) . '" ';
+                $dataAttrs .= 'data-status="Hiển thị" ';
                 $dataAttrs .= 'data-description="' . htmlspecialchars($row['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
                 
                 echo '<article class="product-card">';
@@ -274,7 +274,7 @@ require_once("../connect.php");
           <?php
             // Hiển thị danh sách phụ kiện
             if (isset($conn) && !$conn->connect_error) {
-              $sqlA = "SELECT a.id, a.name, a.price, a.stock, a.status, a.description, a.brand, a.material, a.size,
+              $sqlA = "SELECT a.id, a.name, a.price, a.stock, a.description, a.brand, a.material, a.size,
                               (SELECT image_url FROM images i
                                WHERE i.item_type='ACCESSORY' AND i.item_id=a.id
                                ORDER BY is_primary DESC, display_order ASC, id ASC
@@ -288,7 +288,7 @@ require_once("../connect.php");
                 while ($rowA = $resA->fetch_assoc()) {
                   $imgA = $rowA['image_url'] ? ('../' . $rowA['image_url']) : ('https://placehold.co/600x500?text=' . rawurlencode($rowA['name']));
                   $priceA = number_format((float)$rowA['price'], 0, ',', '.') . '₫';
-                  $statusText = ($rowA['status'] === 'ACTIVE') ? 'Đang bán' : (($rowA['status'] === 'OUT_OF_STOCK') ? 'Hết hàng' : 'Ngừng bán');
+                  $statusText = 'Hiển thị';
 
                   // Dữ liệu cho modal phụ kiện (modal riêng)
                   $dataAttrsA = 'data-id="acc-' . (int)$rowA['id'] . '" ';
@@ -298,7 +298,7 @@ require_once("../connect.php");
                   $dataAttrsA .= 'data-brand="' . htmlspecialchars($rowA['brand'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
                   $dataAttrsA .= 'data-material="' . htmlspecialchars($rowA['material'] ?: 'Chưa rõ', ENT_QUOTES) . '" ';
                   $dataAttrsA .= 'data-size="' . htmlspecialchars($rowA['size'] ?: '—', ENT_QUOTES) . '" ';
-                  $dataAttrsA .= 'data-status="' . htmlspecialchars($statusText, ENT_QUOTES) . '" ';
+                  $dataAttrsA .= 'data-status="Hiển thị" ';
                   $dataAttrsA .= 'data-description="' . htmlspecialchars($rowA['description'] ?: 'Chưa có thông tin chi tiết.', ENT_QUOTES) . '"';
 
                   echo '<article class="product-card">';

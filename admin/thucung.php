@@ -43,7 +43,6 @@ $sql = "SELECT
             p.description, 
             p.price, 
             p.stock, 
-            p.status,
             p.is_visible,
             img.image_url,
             p.created_at, 
@@ -136,7 +135,7 @@ $stmt->close();
             <th>Mô tả</th>
             <th>Giá</th>
             <th>Stock</th>
-            <th>Trạng thái</th>
+            
             <th>Hiển thị</th>
             <th>Tạo lúc</th>
             <th>Cập nhật</th>
@@ -178,7 +177,6 @@ $stmt->close();
                     <td><?php echo nl2br(htmlspecialchars(substr($pet['description'], 0, 120))); ?></td>
                     <td><?php echo number_format($pet['price'], 0, ',', '.'); ?> đ</td>
                     <td><?php echo htmlspecialchars($pet['stock']); ?></td>
-                    <td><?php echo htmlspecialchars($pet['status']); ?></td>
                     <td>
                         <button onclick="toggleVisibility(<?php echo $pet['id']; ?>, '<?php echo htmlspecialchars($q); ?>', '<?php echo htmlspecialchars($loai_filter); ?>')" 
                                 style="border:none; background:none; cursor:pointer; padding:4px 8px; font-size:14px;"

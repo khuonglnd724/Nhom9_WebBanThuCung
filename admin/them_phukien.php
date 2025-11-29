@@ -80,12 +80,10 @@ if ($cat_result) {
     </div>
 
     <div>
-        <label>Trạng thái:</label>
-        <select name="status">
-            <option value="AVAILABLE">AVAILABLE</option>
-            <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
-            <option value="HIDDEN">HIDDEN</option>
-        </select>
+        <label>
+            <input type="checkbox" name="is_invisible" value="1">
+            Ẩn sản phẩm sau khi tạo
+        </label>
     </div>
 
     <div>

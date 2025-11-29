@@ -136,15 +136,6 @@ if ($breeds_result) {
     </div>
 
     <div>
-        <label for="status">Trạng thái:</label>
-        <select id="status" name="status">
-            <option value="AVAILABLE"<?= $tc['status']==='AVAILABLE' ? ' selected' : '' ?>>AVAILABLE</option>
-            <option value="SOLD"<?= $tc['status']==='SOLD' ? ' selected' : '' ?>>SOLD</option>
-            <option value="HIDDEN"<?= $tc['status']==='HIDDEN' ? ' selected' : '' ?>>HIDDEN</option>
-        </select>
-    </div>
-
-    <div>
         <label for="is_visible">Hiển thị trên trang chủ:</label>
         <select id="is_visible" name="is_visible">
             <option value="1"<?= $tc['is_visible'] == 1 ? ' selected' : '' ?>>Hiện</option>

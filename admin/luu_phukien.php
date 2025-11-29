@@ -72,23 +72,16 @@ $size = trim($_POST['size'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $price = floatval($_POST['price'] ?? 0);
 $stock = intval($_POST['stock'] ?? 1);
-$status = $_POST['status'] ?? 'AVAILABLE';
+$is_invisible = isset($_POST['is_invisible']) ? 1 : 0;
+$is_visible = $is_invisible ? 0 : 1;
 
 // Validate
 if (empty($name) || $category_id <= 0 || $price <= 0) {
     die('Vui lòng điền đầy đủ thông tin bắt buộc!');
 }
 
-// Chuẩn hóa trạng thái theo enum của bảng accessories: ACTIVE, INACTIVE, OUT_OF_STOCK
-$status = strtoupper(trim($status));
-if ($status === 'AVAILABLE') { // map từ form cũ
-    $status = 'ACTIVE';
-} elseif ($status === 'HIDDEN') {
-    $status = 'INACTIVE';
-}
-if (!in_array($status, ['ACTIVE','INACTIVE','OUT_OF_STOCK'], true)) {
-    $status = 'ACTIVE';
-}
+// Trạng thái sản phẩm đã loại bỏ; luôn hiển thị nếu không ẩn bằng is_visible (mặc định 1)
+// is_visible sẽ được đặt mặc định là 1 khi thêm mới.
 
 // Xử lý upload ảnh
 $image_url = null;
@@ -124,14 +117,14 @@ $conn->begin_transaction();
 
 try {
     // Insert vào bảng accessories
-    $sql = "INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock, status, created_at, updated_at) 
+    $sql = "INSERT INTO accessories (category_id, name, brand, material, size, description, price, stock, is_visible, created_at, updated_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         throw new Exception('Lỗi prepare accessories: ' . $conn->error);
     }
-    $stmt->bind_param('isssssdis', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $status);
+    $stmt->bind_param('isssssdii', $category_id, $name, $brand, $material, $size, $description, $price, $stock, $is_visible);
     
     if (!$stmt->execute()) {
         throw new Exception('Lỗi khi thêm phụ kiện: ' . $stmt->error);
