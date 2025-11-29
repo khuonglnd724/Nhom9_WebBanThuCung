@@ -35,11 +35,11 @@ if ($conn && !$conn->connect_error) {
   if ($priceParam === 'low') {
     $conditions[] = "a.price < 100000";
   } elseif ($priceParam === 'mid') {
-    $conditions[] = "a.price >= 100000 AND a.price <= 300000";
+    $conditions[] = "a.price >= 100000 AND a.price <= 500000";
   } elseif ($priceParam === 'high') {
-    $conditions[] = "a.price > 300000 AND a.price <= 700000";
+    $conditions[] = "a.price > 500000 AND a.price <= 1000000";
   } elseif ($priceParam === 'over') {
-    $conditions[] = "a.price > 700000";
+    $conditions[] = "a.price > 1000000";
   }
   $whereSql = count($conditions) ? ('WHERE ' . implode(' AND ', $conditions)) : '';
 
@@ -232,9 +232,9 @@ SQL;
           <select id="filter-price" name="price">
             <option value="">Lọc theo giá</option>
             <option value="low" <?php echo ($priceParam==='low')?'selected':''; ?>>Dưới 100k</option>
-            <option value="mid" <?php echo ($priceParam==='mid')?'selected':''; ?>>100k – 300k</option>
-            <option value="high" <?php echo ($priceParam==='high')?'selected':''; ?>>300k – 700k</option>
-            <option value="over" <?php echo ($priceParam==='over')?'selected':''; ?>>Trên 700k</option>
+            <option value="mid" <?php echo ($priceParam==='mid')?'selected':''; ?>>100k – 500k</option>
+            <option value="high" <?php echo ($priceParam==='high')?'selected':''; ?>>500k – 1000k</option>
+            <option value="over" <?php echo ($priceParam==='over')?'selected':''; ?>>Trên 1000k</option>
           </select>
           <button id="filter-btn" class="btn btn-primary" type="submit">Lọc</button>
           <?php if ($categoryId>0 || $priceParam): ?>
